@@ -6,6 +6,7 @@ enum Genre {
   toilet,
   washroom,
   laundry,
+  condiment,
   other;
 
   String get label {
@@ -20,6 +21,8 @@ enum Genre {
         return '洗面所';
       case Genre.laundry:
         return '洗濯';
+      case Genre.condiment:
+        return '調味料';
       case Genre.other:
         return 'その他';
     }
@@ -37,6 +40,8 @@ enum Genre {
         return Icons.face_retouching_natural_rounded;
       case Genre.laundry:
         return Icons.local_laundry_service_rounded;
+      case Genre.condiment:
+        return Icons.set_meal_rounded;
       case Genre.other:
         return Icons.category_rounded;
     }
@@ -54,6 +59,8 @@ enum Genre {
         return const Color(0xFFFFB74D);
       case Genre.laundry:
         return const Color(0xFF9575CD);
+      case Genre.condiment:
+        return const Color(0xFFA1887F);
       case Genre.other:
         return const Color(0xFF4DB6AC);
     }

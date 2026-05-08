@@ -4,10 +4,13 @@ import '../models/stock_level.dart';
 
 List<StockItem> buildDefaultItems() {
   final kitchenItems = [
-    '醤油', '味噌', '砂糖', '塩', '酢', 'みりん', '料理酒',
-    'サラダ油', 'ごま油', 'だしの素', 'コンソメ',
     'キッチンペーパー', 'ラップ', 'アルミホイル', 'ゴミ袋',
     '食器洗い洗剤', 'スポンジ',
+  ];
+
+  final condimentItems = [
+    '醤油', '味噌', '砂糖', '塩', '酢', 'みりん', '料理酒',
+    'サラダ油', 'ごま油', 'だしの素', 'コンソメ',
   ];
 
   final bathItems = [
@@ -51,6 +54,7 @@ List<StockItem> buildDefaultItems() {
     ...makeItems(toiletItems, Genre.toilet),
     ...makeItems(washroomItems, Genre.washroom),
     ...makeItems(laundryItems, Genre.laundry),
+    ...makeItems(condimentItems, Genre.condiment),
     ...makeItems(otherItems, Genre.other),
   ];
 }
