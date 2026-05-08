@@ -24,7 +24,7 @@ class InventoryFilter {
       }
       if (levels!.contains(StockLevel.low) &&
           levels!.contains(StockLevel.empty)) {
-        return '残量少・残量なし';
+        return '残量少';
       }
     }
     return '全ての在庫';

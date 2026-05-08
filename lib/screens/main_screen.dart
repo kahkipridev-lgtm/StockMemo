@@ -56,13 +56,13 @@ class MainScreen extends StatelessWidget {
                     const SizedBox(height: 16),
                     _MenuButton(
                       icon: Icons.warning_amber_rounded,
-                      label: '残量少・残量なしを確認',
+                      label: '残量少を確認',
                       subtitle: '補充が必要なものを確認する',
                       color: const Color(0xFFFF9800),
                       onTap: () => Navigator.of(context).pushNamed(
                         '/inventory',
                         arguments: InventoryFilter(
-                          levels: [StockLevel.low, StockLevel.empty],
+                          levels: [StockLevel.low],
                         ),
                       ),
                     ),
