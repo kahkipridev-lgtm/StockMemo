@@ -15,8 +15,19 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
+  static const _tabColors = [
+    Color(0xFF2E7D32),
+    Color(0xFFFF9800),
+    Color(0xFFF44336),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final indicatorColor = _currentIndex < 3
+        ? _tabColors[_currentIndex]
+        : colorScheme.secondary;
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
@@ -35,26 +46,27 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
+        indicatorColor: indicatorColor.withValues(alpha: 0.2),
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.category_outlined),
-            selectedIcon: Icon(Icons.category_rounded),
+            icon: const Icon(Icons.category_outlined, color: Color(0xFF2E7D32)),
+            selectedIcon: const Icon(Icons.category_rounded, color: Color(0xFF2E7D32)),
             label: '在庫を確認',
           ),
           NavigationDestination(
-            icon: Icon(Icons.warning_amber_outlined),
-            selectedIcon: Icon(Icons.warning_amber_rounded),
+            icon: const Icon(Icons.warning_amber_outlined, color: Color(0xFFFF9800)),
+            selectedIcon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFFF9800)),
             label: '残量少を確認',
           ),
           NavigationDestination(
-            icon: Icon(Icons.remove_circle_outline_rounded),
-            selectedIcon: Icon(Icons.remove_circle_rounded),
+            icon: const Icon(Icons.remove_circle_outline_rounded, color: Color(0xFFF44336)),
+            selectedIcon: const Icon(Icons.remove_circle_rounded, color: Color(0xFFF44336)),
             label: '残量なしを確認',
           ),
           NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings_rounded),
+            icon: Icon(Icons.settings_outlined, color: colorScheme.secondary),
+            selectedIcon: Icon(Icons.settings_rounded, color: colorScheme.secondary),
             label: '設定',
           ),
         ],
