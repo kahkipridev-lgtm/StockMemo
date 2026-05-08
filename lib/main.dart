@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'providers/settings_provider.dart';
 import 'screens/genre_selection_screen.dart';
+import 'screens/home_screen.dart';
 import 'screens/inventory_screen.dart';
-import 'screens/main_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/splash_screen.dart';
 
@@ -43,7 +43,7 @@ class StockMemoApp extends ConsumerWidget {
       initialRoute: '/',
       routes: {
         '/': (_) => const SplashScreen(),
-        '/main': (_) => const MainScreen(),
+        '/home': (_) => const HomeScreen(),
         '/genres': (_) => const GenreSelectionScreen(),
         '/inventory': (_) => const InventoryScreen(),
         '/settings': (_) => const SettingsScreen(),

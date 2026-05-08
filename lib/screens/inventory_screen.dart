@@ -32,7 +32,9 @@ class InventoryFilter {
 }
 
 class InventoryScreen extends ConsumerStatefulWidget {
-  const InventoryScreen({super.key});
+  final InventoryFilter? filter;
+
+  const InventoryScreen({super.key, this.filter});
 
   @override
   ConsumerState<InventoryScreen> createState() => _InventoryScreenState();
@@ -44,9 +46,9 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filter =
-        ModalRoute.of(context)?.settings.arguments as InventoryFilter? ??
-            const InventoryFilter();
+    final filter = widget.filter ??
+        (ModalRoute.of(context)?.settings.arguments as InventoryFilter?) ??
+        const InventoryFilter();
     final itemsAsync = ref.watch(inventoryProvider);
     final settingsAsync = ref.watch(settingsProvider);
 
@@ -104,6 +106,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: () => _showAddDialog(context, filter.genre),
         child: const Icon(Icons.add_rounded),
       ),
