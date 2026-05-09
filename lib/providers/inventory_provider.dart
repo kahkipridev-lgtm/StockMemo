@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/default_items.dart';
-import '../models/genre.dart';
 import '../models/stock_item.dart';
 import '../models/stock_level.dart';
 
@@ -58,12 +57,12 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     await _save(updated);
   }
 
-  Future<void> addItem(String name, Genre genre) async {
+  Future<void> addItem(String name, String genreId) async {
     final items = state.value ?? [];
     final newItem = StockItem(
       id: _uuid.v4(),
       name: name,
-      genre: genre,
+      genreId: genreId,
       stockLevel: StockLevel.full,
       isDefault: false,
       statusUpdatedAt: DateTime.now(),

@@ -35,13 +35,13 @@ List<StockItem> buildDefaultItems({DateTime? installedAt}) {
 
   int counter = 0;
 
-  List<StockItem> makeItems(List<String> names, Genre genre) {
+  List<StockItem> makeItems(List<String> names, String genreId) {
     return names.map((name) {
       final id = 'default_${counter++}';
       return StockItem(
         id: id,
         name: name,
-        genre: genre,
+        genreId: genreId,
         stockLevel: StockLevel.full,
         isDefault: true,
         statusUpdatedAt: installedAt,
@@ -50,12 +50,12 @@ List<StockItem> buildDefaultItems({DateTime? installedAt}) {
   }
 
   return [
-    ...makeItems(kitchenItems, Genre.kitchen),
-    ...makeItems(bathItems, Genre.bath),
-    ...makeItems(toiletItems, Genre.toilet),
-    ...makeItems(washroomItems, Genre.washroom),
-    ...makeItems(laundryItems, Genre.laundry),
-    ...makeItems(condimentItems, Genre.condiment),
-    ...makeItems(otherItems, Genre.other),
+    ...makeItems(kitchenItems, Genre.kitchen.id),
+    ...makeItems(bathItems, Genre.bath.id),
+    ...makeItems(toiletItems, Genre.toilet.id),
+    ...makeItems(washroomItems, Genre.washroom.id),
+    ...makeItems(laundryItems, Genre.laundry.id),
+    ...makeItems(condimentItems, Genre.condiment.id),
+    ...makeItems(otherItems, Genre.other.id),
   ];
 }

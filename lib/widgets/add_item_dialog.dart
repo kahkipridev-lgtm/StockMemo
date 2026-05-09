@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/genre.dart';
+import '../providers/genre_provider.dart';
 import '../providers/inventory_provider.dart';
 
 class AddItemDialog extends ConsumerStatefulWidget {
@@ -32,6 +33,12 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final allGenres = ref.watch(allGenresProvider);
+
+    if (!allGenres.contains(_selectedGenre)) {
+      _selectedGenre = allGenres.first;
+    }
+
     return AlertDialog(
       title: const Text('アイテムを追加'),
       content: Form(
@@ -61,13 +68,14 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
             InputDecorator(
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               ),
               child: DropdownButton<Genre>(
                 value: _selectedGenre,
                 isExpanded: true,
                 underline: const SizedBox(),
-                items: Genre.values
+                items: allGenres
                     .map((g) => DropdownMenuItem(
                           value: g,
                           child: Row(
@@ -104,7 +112,7 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
     if (!_formKey.currentState!.validate()) return;
     ref
         .read(inventoryProvider.notifier)
-        .addItem(_controller.text.trim(), _selectedGenre);
+        .addItem(_controller.text.trim(), _selectedGenre.id);
     Navigator.of(context).pop();
   }
 }

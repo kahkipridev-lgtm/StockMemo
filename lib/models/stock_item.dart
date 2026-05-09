@@ -1,10 +1,9 @@
-import 'genre.dart';
 import 'stock_level.dart';
 
 class StockItem {
   final String id;
   final String name;
-  final Genre genre;
+  final String genreId;
   final StockLevel stockLevel;
   final bool isDefault;
   final DateTime? statusUpdatedAt;
@@ -12,7 +11,7 @@ class StockItem {
   const StockItem({
     required this.id,
     required this.name,
-    required this.genre,
+    required this.genreId,
     this.stockLevel = StockLevel.full,
     this.isDefault = false,
     this.statusUpdatedAt,
@@ -21,7 +20,7 @@ class StockItem {
   StockItem copyWith({
     String? id,
     String? name,
-    Genre? genre,
+    String? genreId,
     StockLevel? stockLevel,
     bool? isDefault,
     DateTime? statusUpdatedAt,
@@ -29,7 +28,7 @@ class StockItem {
     return StockItem(
       id: id ?? this.id,
       name: name ?? this.name,
-      genre: genre ?? this.genre,
+      genreId: genreId ?? this.genreId,
       stockLevel: stockLevel ?? this.stockLevel,
       isDefault: isDefault ?? this.isDefault,
       statusUpdatedAt: statusUpdatedAt ?? this.statusUpdatedAt,
@@ -40,7 +39,7 @@ class StockItem {
     return {
       'id': id,
       'name': name,
-      'genre': genre.toJson(),
+      'genre': genreId,
       'stockLevel': stockLevel.toJson(),
       'isDefault': isDefault,
       'statusUpdatedAt': statusUpdatedAt?.toIso8601String(),
@@ -51,7 +50,7 @@ class StockItem {
     return StockItem(
       id: json['id'] as String,
       name: json['name'] as String,
-      genre: Genre.fromJson(json['genre'] as String),
+      genreId: json['genre'] as String,
       stockLevel: StockLevel.fromJson(json['stockLevel'] as String),
       isDefault: json['isDefault'] as bool? ?? false,
       statusUpdatedAt: json['statusUpdatedAt'] != null

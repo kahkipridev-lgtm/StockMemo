@@ -115,7 +115,7 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
 
   List<StockItem> _filterItems(List<StockItem> items, InventoryFilter filter) {
     return items.where((item) {
-      if (filter.genre != null && item.genre != filter.genre) return false;
+      if (filter.genre != null && item.genreId != filter.genre!.id) return false;
       if (filter.levels != null && !filter.levels!.contains(item.stockLevel)) {
         return false;
       }
