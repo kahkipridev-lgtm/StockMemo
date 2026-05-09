@@ -18,6 +18,17 @@ class GenreSelectionScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('ジャンルを選択'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => const AddGenreDialog(),
+              );
+            },
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -84,9 +95,6 @@ class GenreSelectionScreen extends ConsumerWidget {
                   ),
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      if (index == allGenres.length) {
-                        return _AddGenreCard(primaryColor: primaryColor);
-                      }
                       final genre = allGenres[index];
                       return GenreCard(
                         genre: genre,
@@ -98,67 +106,13 @@ class GenreSelectionScreen extends ConsumerWidget {
                         },
                       );
                     },
-                    childCount: allGenres.length + 1,
+                    childCount: allGenres.length,
                   ),
                 ),
               ),
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _AddGenreCard extends StatelessWidget {
-  final Color primaryColor;
-
-  const _AddGenreCard({required this.primaryColor});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (_) => const AddGenreDialog(),
-          );
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: primaryColor.withValues(alpha: 0.10),
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: primaryColor.withValues(alpha: 0.3),
-                    width: 1.5,
-                    strokeAlign: BorderSide.strokeAlignInside,
-                  ),
-                ),
-                child: Icon(Icons.add_rounded, size: 32, color: primaryColor),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'ジャンルを追加',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: primaryColor,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
