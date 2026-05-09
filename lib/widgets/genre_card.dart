@@ -5,8 +5,9 @@ import '../models/genre.dart';
 class GenreCard extends StatelessWidget {
   final Genre genre;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
-  const GenreCard({super.key, required this.genre, required this.onTap});
+  const GenreCard({super.key, required this.genre, required this.onTap, this.onLongPress});
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +16,7 @@ class GenreCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
+        onLongPress: onLongPress,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(20),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/genre.dart';
 import '../providers/genre_provider.dart';
 import '../widgets/add_genre_dialog.dart';
 import '../widgets/genre_card.dart';
@@ -96,6 +97,8 @@ class GenreSelectionScreen extends ConsumerWidget {
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final genre = allGenres[index];
+                      final isBuiltIn =
+                          Genre.builtIns.any((b) => b.id == genre.id);
                       return GenreCard(
                         genre: genre,
                         onTap: () {
@@ -104,6 +107,15 @@ class GenreSelectionScreen extends ConsumerWidget {
                             arguments: InventoryFilter(genre: genre),
                           );
                         },
+                        onLongPress: isBuiltIn
+                            ? null
+                            : () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) =>
+                                      AddGenreDialog(initialGenre: genre),
+                                );
+                              },
                       );
                     },
                     childCount: allGenres.length,

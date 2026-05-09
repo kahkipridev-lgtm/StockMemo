@@ -6,7 +6,9 @@ import '../models/genre.dart';
 import '../providers/genre_provider.dart';
 
 class AddGenreDialog extends ConsumerStatefulWidget {
-  const AddGenreDialog({super.key});
+  final Genre? initialGenre;
+
+  const AddGenreDialog({super.key, this.initialGenre});
 
   @override
   ConsumerState<AddGenreDialog> createState() => _AddGenreDialogState();
@@ -59,8 +61,23 @@ class _AddGenreDialogState extends ConsumerState<AddGenreDialog> {
 
   final _controller = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  Color _selectedColor = _colors[7];
-  IconData _selectedIcon = Icons.category_rounded;
+  late Color _selectedColor;
+  late IconData _selectedIcon;
+
+  bool get _isEdit => widget.initialGenre != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEdit) {
+      _controller.text = widget.initialGenre!.label;
+      _selectedColor = widget.initialGenre!.color;
+      _selectedIcon = widget.initialGenre!.icon;
+    } else {
+      _selectedColor = _colors[7];
+      _selectedIcon = Icons.category_rounded;
+    }
+  }
 
   @override
   void dispose() {
@@ -71,7 +88,7 @@ class _AddGenreDialogState extends ConsumerState<AddGenreDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('ジャンルを追加'),
+      title: Text(_isEdit ? 'ジャンルを編集' : 'ジャンルを追加'),
       contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       content: SizedBox(
         width: double.maxFinite,
@@ -86,7 +103,7 @@ class _AddGenreDialogState extends ConsumerState<AddGenreDialog> {
                 const SizedBox(height: 20),
                 TextFormField(
                   controller: _controller,
-                  autofocus: true,
+                  autofocus: !_isEdit,
                   decoration: const InputDecoration(
                     labelText: 'ジャンル名',
                     border: OutlineInputBorder(),
@@ -195,14 +212,22 @@ class _AddGenreDialogState extends ConsumerState<AddGenreDialog> {
           ),
         ),
       ),
+      actionsAlignment:
+          _isEdit ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
       actions: [
+        if (_isEdit)
+          TextButton(
+            onPressed: _delete,
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('削除'),
+          ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('キャンセル'),
         ),
         FilledButton(
           onPressed: _submit,
-          child: const Text('追加'),
+          child: Text(_isEdit ? '保存' : '追加'),
         ),
       ],
     );
@@ -211,13 +236,46 @@ class _AddGenreDialogState extends ConsumerState<AddGenreDialog> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     final genre = Genre(
-      id: _uuid.v4(),
+      id: _isEdit ? widget.initialGenre!.id : _uuid.v4(),
       label: _controller.text.trim(),
       icon: _selectedIcon,
       color: _selectedColor,
     );
-    ref.read(customGenreProvider.notifier).addGenre(genre);
+    if (_isEdit) {
+      ref.read(customGenreProvider.notifier).updateGenre(genre);
+    } else {
+      ref.read(customGenreProvider.notifier).addGenre(genre);
+    }
     Navigator.of(context).pop();
+  }
+
+  Future<void> _delete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('削除確認'),
+        content: Text(
+          '「${widget.initialGenre!.label}」を削除しますか？\nこのジャンルのアイテムは「その他」に表示されます。',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('削除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && mounted) {
+      ref
+          .read(customGenreProvider.notifier)
+          .deleteGenre(widget.initialGenre!.id);
+      Navigator.of(context).pop();
+    }
   }
 }
 

@@ -35,6 +35,13 @@ class CustomGenreNotifier extends AsyncNotifier<List<Genre>> {
     await _save(updated);
   }
 
+  Future<void> updateGenre(Genre genre) async {
+    final current = state.value ?? [];
+    final updated = current.map((g) => g.id == genre.id ? genre : g).toList();
+    state = AsyncData(updated);
+    await _save(updated);
+  }
+
   Future<void> deleteGenre(String id) async {
     final current = state.value ?? [];
     final updated = current.where((g) => g.id != id).toList();
