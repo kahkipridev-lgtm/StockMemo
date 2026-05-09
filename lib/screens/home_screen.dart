@@ -17,9 +17,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
   static const _tabColors = [
-    Color(0xFF2E7D32),
-    Color(0xFFFF9800),
-    Color(0xFFF44336),
+    Color(0xFF7A5100),
+    Color(0xFFA86400),
+    Color(0xFFC0392B),
   ];
 
   @override
@@ -51,18 +51,18 @@ class _HomeScreenState extends State<HomeScreen> {
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
         destinations: [
           NavigationDestination(
-            icon: const Icon(Icons.category_outlined, color: Color(0xFF2E7D32)),
-            selectedIcon: const Icon(Icons.category_rounded, color: Color(0xFF2E7D32)),
+            icon: const Icon(Icons.category_outlined, color: Color(0xFF7A5100)),
+            selectedIcon: const Icon(Icons.category_rounded, color: Color(0xFF7A5100)),
             label: '在庫を確認',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.warning_amber_outlined, color: Color(0xFFFF9800)),
-            selectedIcon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFFF9800)),
+            icon: const Icon(Icons.warning_amber_outlined, color: Color(0xFFA86400)),
+            selectedIcon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFA86400)),
             label: '残量少を確認',
           ),
           NavigationDestination(
-            icon: const Icon(Icons.remove_circle_outline_rounded, color: Color(0xFFF44336)),
-            selectedIcon: const Icon(Icons.remove_circle_rounded, color: Color(0xFFF44336)),
+            icon: const Icon(Icons.remove_circle_outline_rounded, color: Color(0xFFC0392B)),
+            selectedIcon: const Icon(Icons.remove_circle_rounded, color: Color(0xFFC0392B)),
             label: '残量なしを確認',
           ),
           NavigationDestination(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'providers/settings_provider.dart';
 import 'screens/genre_selection_screen.dart';
@@ -26,19 +27,21 @@ class StockMemoApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32),
+          seedColor: const Color(0xFFE1AF64),
           brightness: Brightness.light,
         ),
         useMaterial3: true,
-        fontFamily: 'HiraginoSans',
+        textTheme: GoogleFonts.zenMaruGothicTextTheme(),
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF2E7D32),
+          seedColor: const Color(0xFFE1AF64),
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
-        fontFamily: 'HiraginoSans',
+        textTheme: GoogleFonts.zenMaruGothicTextTheme(
+          ThemeData(brightness: Brightness.dark).textTheme,
+        ),
       ),
       initialRoute: '/',
       routes: {

@@ -16,18 +16,18 @@ class AddGenreDialog extends ConsumerStatefulWidget {
 
 class _AddGenreDialogState extends ConsumerState<AddGenreDialog> {
   static const _colors = [
-    Color(0xFFEF5350),
-    Color(0xFFFF7043),
-    Color(0xFFFFA726),
-    Color(0xFFFFCA28),
-    Color(0xFF66BB6A),
-    Color(0xFF26A69A),
-    Color(0xFF26C6DA),
-    Color(0xFF42A5F5),
-    Color(0xFF7E57C2),
-    Color(0xFFEC407A),
-    Color(0xFF8D6E63),
-    Color(0xFF78909C),
+    Color(0xFFC0392B),
+    Color(0xFFD4501A),
+    Color(0xFFA86400),
+    Color(0xFFB8860B),
+    Color(0xFF9B6000),
+    Color(0xFF6B8C3A),
+    Color(0xFF357A45),
+    Color(0xFF5A7F6A),
+    Color(0xFF5B8FA8),
+    Color(0xFF9B5A7A),
+    Color(0xFF8B5A2B),
+    Color(0xFF7A6258),
   ];
 
   static const _icons = [

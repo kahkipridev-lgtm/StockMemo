@@ -17,43 +17,43 @@ class Genre {
     id: 'condiment',
     label: '調味料',
     icon: Icons.set_meal_rounded,
-    color: Color(0xFFA1887F),
+    color: Color(0xFFB8860B),
   );
   static const kitchen = Genre(
     id: 'kitchen',
     label: '台所',
     icon: Icons.kitchen_rounded,
-    color: Color(0xFFE57373),
+    color: Color(0xFFD2691E),
   );
   static const bath = Genre(
     id: 'bath',
     label: '風呂',
     icon: Icons.bathtub_rounded,
-    color: Color(0xFF64B5F6),
+    color: Color(0xFF5B8FA8),
   );
   static const toilet = Genre(
     id: 'toilet',
     label: 'トイレ',
     icon: Icons.wc_rounded,
-    color: Color(0xFF81C784),
+    color: Color(0xFF6B9E6B),
   );
   static const washroom = Genre(
     id: 'washroom',
     label: '洗面所',
     icon: Icons.face_retouching_natural_rounded,
-    color: Color(0xFFFFB74D),
+    color: Color(0xFFB8821A),
   );
   static const laundry = Genre(
     id: 'laundry',
     label: '洗濯',
     icon: Icons.local_laundry_service_rounded,
-    color: Color(0xFF9575CD),
+    color: Color(0xFF9B7EC8),
   );
   static const other = Genre(
     id: 'other',
     label: 'その他',
     icon: Icons.category_rounded,
-    color: Color(0xFF4DB6AC),
+    color: Color(0xFF5A7F6A),
   );
 
   static List<Genre> get builtIns =>
