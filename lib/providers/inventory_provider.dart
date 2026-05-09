@@ -23,7 +23,7 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     final initialized = prefs.getBool(_initializedKey) ?? false;
 
     if (!initialized) {
-      final defaults = buildDefaultItems();
+      final defaults = buildDefaultItems(installedAt: DateTime.now());
       await _save(defaults);
       await prefs.setBool(_initializedKey, true);
       return defaults;
@@ -48,8 +48,11 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
 
   Future<void> updateStockLevel(String id, StockLevel level) async {
     final items = state.value ?? [];
+    final now = DateTime.now();
     final updated = items
-        .map((item) => item.id == id ? item.copyWith(stockLevel: level) : item)
+        .map((item) => item.id == id
+            ? item.copyWith(stockLevel: level, statusUpdatedAt: now)
+            : item)
         .toList();
     state = AsyncData(updated);
     await _save(updated);
@@ -63,6 +66,7 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
       genre: genre,
       stockLevel: StockLevel.full,
       isDefault: false,
+      statusUpdatedAt: DateTime.now(),
     );
     final updated = [...items, newItem];
     state = AsyncData(updated);
@@ -78,8 +82,11 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
 
   Future<void> resetAllToFull() async {
     final items = state.value ?? [];
-    final updated =
-        items.map((item) => item.copyWith(stockLevel: StockLevel.full)).toList();
+    final now = DateTime.now();
+    final updated = items
+        .map((item) =>
+            item.copyWith(stockLevel: StockLevel.full, statusUpdatedAt: now))
+        .toList();
     state = AsyncData(updated);
     await _save(updated);
   }

@@ -2,7 +2,7 @@ import '../models/genre.dart';
 import '../models/stock_item.dart';
 import '../models/stock_level.dart';
 
-List<StockItem> buildDefaultItems() {
+List<StockItem> buildDefaultItems({DateTime? installedAt}) {
   final kitchenItems = [
     'キッチンペーパー', 'ラップ', 'アルミホイル', 'ゴミ袋',
     '食器洗い洗剤', 'スポンジ',
@@ -44,6 +44,7 @@ List<StockItem> buildDefaultItems() {
         genre: genre,
         stockLevel: StockLevel.full,
         isDefault: true,
+        statusUpdatedAt: installedAt,
       );
     }).toList();
   }

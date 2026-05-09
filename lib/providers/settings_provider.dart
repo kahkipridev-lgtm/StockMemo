@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-enum SortOrder { alphabetical, stockLevel }
+enum SortOrder { alphabetical, stockLevel, lastUpdated }
 
 class AppSettings {
   final ThemeMode themeMode;

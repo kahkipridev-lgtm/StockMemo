@@ -33,6 +33,13 @@ class SortBar extends StatelessWidget {
             selected: currentSort == SortOrder.stockLevel,
             onTap: () => onSortChanged(SortOrder.stockLevel),
           ),
+          const SizedBox(width: 8),
+          _SortChip(
+            label: '更新日順',
+            icon: Icons.history_rounded,
+            selected: currentSort == SortOrder.lastUpdated,
+            onTap: () => onSortChanged(SortOrder.lastUpdated),
+          ),
         ],
       ),
     );

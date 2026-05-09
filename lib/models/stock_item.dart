@@ -7,6 +7,7 @@ class StockItem {
   final Genre genre;
   final StockLevel stockLevel;
   final bool isDefault;
+  final DateTime? statusUpdatedAt;
 
   const StockItem({
     required this.id,
@@ -14,6 +15,7 @@ class StockItem {
     required this.genre,
     this.stockLevel = StockLevel.full,
     this.isDefault = false,
+    this.statusUpdatedAt,
   });
 
   StockItem copyWith({
@@ -22,6 +24,7 @@ class StockItem {
     Genre? genre,
     StockLevel? stockLevel,
     bool? isDefault,
+    DateTime? statusUpdatedAt,
   }) {
     return StockItem(
       id: id ?? this.id,
@@ -29,6 +32,7 @@ class StockItem {
       genre: genre ?? this.genre,
       stockLevel: stockLevel ?? this.stockLevel,
       isDefault: isDefault ?? this.isDefault,
+      statusUpdatedAt: statusUpdatedAt ?? this.statusUpdatedAt,
     );
   }
 
@@ -39,6 +43,7 @@ class StockItem {
       'genre': genre.toJson(),
       'stockLevel': stockLevel.toJson(),
       'isDefault': isDefault,
+      'statusUpdatedAt': statusUpdatedAt?.toIso8601String(),
     };
   }
 
@@ -49,6 +54,9 @@ class StockItem {
       genre: Genre.fromJson(json['genre'] as String),
       stockLevel: StockLevel.fromJson(json['stockLevel'] as String),
       isDefault: json['isDefault'] as bool? ?? false,
+      statusUpdatedAt: json['statusUpdatedAt'] != null
+          ? DateTime.tryParse(json['statusUpdatedAt'] as String)
+          : null,
     );
   }
 }

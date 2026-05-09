@@ -10,8 +10,15 @@ class ItemCard extends ConsumerWidget {
 
   const ItemCard({super.key, required this.item, required this.onDelete});
 
+  String? _updatedAtLabel(DateTime? updatedAt) {
+    if (updatedAt == null) return null;
+    final days = DateTime.now().difference(updatedAt).inDays;
+    return days == 0 ? '今日更新' : '$days日前に更新';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final label = _updatedAtLabel(item.statusUpdatedAt);
     return Dismissible(
       key: Key(item.id),
       direction: DismissDirection.endToStart,
@@ -51,6 +58,18 @@ class ItemCard extends ConsumerWidget {
             item.name,
             style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
           ),
+          subtitle: label != null
+              ? Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5),
+                  ),
+                )
+              : null,
           trailing: _StockLevelChip(item: item),
         ),
       ),

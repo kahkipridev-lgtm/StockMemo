@@ -127,12 +127,21 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
     final sorted = List<StockItem>.from(items);
     if (order == SortOrder.alphabetical) {
       sorted.sort((a, b) => a.name.compareTo(b.name));
-    } else {
+    } else if (order == SortOrder.stockLevel) {
       sorted.sort((a, b) {
         final levelCmp =
             a.stockLevel.sortOrder.compareTo(b.stockLevel.sortOrder);
         if (levelCmp != 0) return levelCmp;
         return a.name.compareTo(b.name);
+      });
+    } else {
+      sorted.sort((a, b) {
+        if (a.statusUpdatedAt == null && b.statusUpdatedAt == null) {
+          return a.name.compareTo(b.name);
+        }
+        if (a.statusUpdatedAt == null) return -1;
+        if (b.statusUpdatedAt == null) return 1;
+        return a.statusUpdatedAt!.compareTo(b.statusUpdatedAt!);
       });
     }
     return sorted;
