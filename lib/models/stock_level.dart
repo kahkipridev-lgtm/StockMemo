@@ -5,71 +5,39 @@ enum StockLevel {
   low,
   empty;
 
-  StockLevel get next {
-    switch (this) {
-      case StockLevel.full:
-        return StockLevel.low;
-      case StockLevel.low:
-        return StockLevel.empty;
-      case StockLevel.empty:
-        return StockLevel.full;
-    }
-  }
+  static const _metadata = {
+    StockLevel.full: _Meta(
+      label: '買ったばっかり',
+      color: Color(0xFF4CAF50),
+      backgroundColor: Color(0xFFE8F5E9),
+      icon: Icons.check_circle_rounded,
+      sortOrder: 2,
+      next: StockLevel.low,
+    ),
+    StockLevel.low: _Meta(
+      label: '残量少',
+      color: Color(0xFFFF9800),
+      backgroundColor: Color(0xFFFFF3E0),
+      icon: Icons.warning_amber_rounded,
+      sortOrder: 1,
+      next: StockLevel.empty,
+    ),
+    StockLevel.empty: _Meta(
+      label: '残量なし',
+      color: Color(0xFFF44336),
+      backgroundColor: Color(0xFFFFEBEE),
+      icon: Icons.remove_circle_rounded,
+      sortOrder: 0,
+      next: StockLevel.full,
+    ),
+  };
 
-  String get label {
-    switch (this) {
-      case StockLevel.full:
-        return '買ったばっかり';
-      case StockLevel.low:
-        return '残量少';
-      case StockLevel.empty:
-        return '残量なし';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case StockLevel.full:
-        return const Color(0xFF4CAF50);
-      case StockLevel.low:
-        return const Color(0xFFFF9800);
-      case StockLevel.empty:
-        return const Color(0xFFF44336);
-    }
-  }
-
-  Color get backgroundColor {
-    switch (this) {
-      case StockLevel.full:
-        return const Color(0xFFE8F5E9);
-      case StockLevel.low:
-        return const Color(0xFFFFF3E0);
-      case StockLevel.empty:
-        return const Color(0xFFFFEBEE);
-    }
-  }
-
-  IconData get icon {
-    switch (this) {
-      case StockLevel.full:
-        return Icons.check_circle_rounded;
-      case StockLevel.low:
-        return Icons.warning_amber_rounded;
-      case StockLevel.empty:
-        return Icons.remove_circle_rounded;
-    }
-  }
-
-  int get sortOrder {
-    switch (this) {
-      case StockLevel.empty:
-        return 0;
-      case StockLevel.low:
-        return 1;
-      case StockLevel.full:
-        return 2;
-    }
-  }
+  StockLevel get next => _metadata[this]!.next;
+  String get label => _metadata[this]!.label;
+  Color get color => _metadata[this]!.color;
+  Color get backgroundColor => _metadata[this]!.backgroundColor;
+  IconData get icon => _metadata[this]!.icon;
+  int get sortOrder => _metadata[this]!.sortOrder;
 
   String toJson() => name;
 
@@ -79,4 +47,22 @@ enum StockLevel {
       orElse: () => StockLevel.full,
     );
   }
+}
+
+class _Meta {
+  final String label;
+  final Color color;
+  final Color backgroundColor;
+  final IconData icon;
+  final int sortOrder;
+  final StockLevel next;
+
+  const _Meta({
+    required this.label,
+    required this.color,
+    required this.backgroundColor,
+    required this.icon,
+    required this.sortOrder,
+    required this.next,
+  });
 }

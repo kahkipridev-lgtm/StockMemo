@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../models/inventory_filter.dart';
 import '../models/stock_level.dart';
 import 'genre_selection_screen.dart';
 import 'inventory_screen.dart';
@@ -24,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final indicatorColor = _currentIndex < 3
+    final indicatorColor = _currentIndex < _tabColors.length
         ? _tabColors[_currentIndex]
         : colorScheme.secondary;
 

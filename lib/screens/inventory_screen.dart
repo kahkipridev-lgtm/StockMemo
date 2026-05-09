@@ -2,34 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/genre.dart';
-import '../models/stock_item.dart';
-import '../models/stock_level.dart';
+import '../models/inventory_filter.dart';
 import '../providers/inventory_provider.dart';
 import '../providers/settings_provider.dart';
+import '../utils/inventory_utils.dart';
 import '../widgets/add_item_dialog.dart';
 import '../widgets/item_card.dart';
 import '../widgets/sort_bar.dart';
-
-class InventoryFilter {
-  final Genre? genre;
-  final List<StockLevel>? levels;
-
-  const InventoryFilter({this.genre, this.levels});
-
-  String get title {
-    if (genre != null) return genre!.label;
-    if (levels != null) {
-      if (levels!.length == 1 && levels!.first == StockLevel.empty) {
-        return '残量なし';
-      }
-      if (levels!.contains(StockLevel.low) &&
-          levels!.contains(StockLevel.empty)) {
-        return '残量少';
-      }
-    }
-    return '全ての在庫';
-  }
-}
 
 class InventoryScreen extends ConsumerStatefulWidget {
   final InventoryFilter? filter;
@@ -73,8 +52,8 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('エラー: $e')),
         data: (items) {
-          final filtered = _filterItems(items, filter);
-          final sorted = _sortItems(filtered, _sortOrder);
+          final filtered = filterItems(items, filter);
+          final sorted = sortItems(filtered, _sortOrder);
 
           return Column(
             children: [
@@ -111,40 +90,6 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
         child: const Icon(Icons.add_rounded),
       ),
     );
-  }
-
-  List<StockItem> _filterItems(List<StockItem> items, InventoryFilter filter) {
-    return items.where((item) {
-      if (filter.genre != null && item.genreId != filter.genre!.id) return false;
-      if (filter.levels != null && !filter.levels!.contains(item.stockLevel)) {
-        return false;
-      }
-      return true;
-    }).toList();
-  }
-
-  List<StockItem> _sortItems(List<StockItem> items, SortOrder order) {
-    final sorted = List<StockItem>.from(items);
-    if (order == SortOrder.alphabetical) {
-      sorted.sort((a, b) => a.name.compareTo(b.name));
-    } else if (order == SortOrder.stockLevel) {
-      sorted.sort((a, b) {
-        final levelCmp =
-            a.stockLevel.sortOrder.compareTo(b.stockLevel.sortOrder);
-        if (levelCmp != 0) return levelCmp;
-        return a.name.compareTo(b.name);
-      });
-    } else {
-      sorted.sort((a, b) {
-        if (a.statusUpdatedAt == null && b.statusUpdatedAt == null) {
-          return a.name.compareTo(b.name);
-        }
-        if (a.statusUpdatedAt == null) return -1;
-        if (b.statusUpdatedAt == null) return 1;
-        return a.statusUpdatedAt!.compareTo(b.statusUpdatedAt!);
-      });
-    }
-    return sorted;
   }
 
   void _showAddDialog(BuildContext context, Genre? genre) {

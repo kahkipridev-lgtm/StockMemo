@@ -138,6 +138,35 @@ class _SortSetting extends ConsumerWidget {
   }
 }
 
+Future<bool> _showConfirmDialog(
+  BuildContext context, {
+  required String message,
+  required String confirmLabel,
+  Color? confirmColor,
+}) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('確認'),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(false),
+          child: const Text('キャンセル'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(ctx).pop(true),
+          style: confirmColor != null
+              ? FilledButton.styleFrom(backgroundColor: confirmColor)
+              : null,
+          child: Text(confirmLabel),
+        ),
+      ],
+    ),
+  );
+  return confirmed == true;
+}
+
 class _ResetStockTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -146,26 +175,13 @@ class _ResetStockTile extends ConsumerWidget {
       title: const Text('全データをリセット'),
       subtitle: const Text('全アイテムを「買ったばっかり」に戻す'),
       onTap: () async {
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('確認'),
-            content: const Text('全アイテムの残量を「買ったばっかり」にリセットしますか？'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('キャンセル'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                style: FilledButton.styleFrom(
-                    backgroundColor: Colors.orange),
-                child: const Text('リセット'),
-              ),
-            ],
-          ),
+        final confirmed = await _showConfirmDialog(
+          context,
+          message: '全アイテムの残量を「買ったばっかり」にリセットしますか？',
+          confirmLabel: 'リセット',
+          confirmColor: Colors.orange,
         );
-        if (confirmed == true) {
+        if (confirmed) {
           await ref.read(inventoryProvider.notifier).resetAllToFull();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -186,24 +202,12 @@ class _RestoreDefaultsTile extends ConsumerWidget {
       title: const Text('デフォルトアイテムを復元'),
       subtitle: const Text('削除したデフォルトアイテムを再登録する'),
       onTap: () async {
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('確認'),
-            content: const Text('削除済みのデフォルトアイテムを復元しますか？\n既存のアイテムには影響しません。'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctx).pop(false),
-                child: const Text('キャンセル'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.of(ctx).pop(true),
-                child: const Text('復元'),
-              ),
-            ],
-          ),
+        final confirmed = await _showConfirmDialog(
+          context,
+          message: '削除済みのデフォルトアイテムを復元しますか？\n既存のアイテムには影響しません。',
+          confirmLabel: '復元',
         );
-        if (confirmed == true) {
+        if (confirmed) {
           await ref.read(inventoryProvider.notifier).restoreDefaults();
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(

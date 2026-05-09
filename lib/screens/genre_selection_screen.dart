@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/genre.dart';
+import '../models/inventory_filter.dart';
 import '../providers/genre_provider.dart';
 import '../widgets/add_genre_dialog.dart';
 import '../widgets/genre_card.dart';
-import 'inventory_screen.dart';
 
 class GenreSelectionScreen extends ConsumerWidget {
   const GenreSelectionScreen({super.key});

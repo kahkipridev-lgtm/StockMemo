@@ -17,6 +17,8 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     return _load();
   }
 
+  List<StockItem> get _items => state.value ?? [];
+
   Future<List<StockItem>> _load() async {
     final prefs = await SharedPreferences.getInstance();
     final initialized = prefs.getBool(_initializedKey) ?? false;
@@ -31,10 +33,14 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     final raw = prefs.getString(_key);
     if (raw == null) return [];
 
-    final list = jsonDecode(raw) as List<dynamic>;
-    return list
-        .map((e) => StockItem.fromJson(e as Map<String, dynamic>))
-        .toList();
+    try {
+      final list = jsonDecode(raw) as List<dynamic>;
+      return list
+          .map((e) => StockItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   Future<void> _save(List<StockItem> items) async {
@@ -46,7 +52,7 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
   }
 
   Future<void> updateStockLevel(String id, StockLevel level) async {
-    final items = state.value ?? [];
+    final items = _items;
     final now = DateTime.now();
     final updated = items
         .map((item) => item.id == id
@@ -58,7 +64,7 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
   }
 
   Future<void> addItem(String name, String genreId) async {
-    final items = state.value ?? [];
+    final items = _items;
     final newItem = StockItem(
       id: _uuid.v4(),
       name: name,
@@ -73,14 +79,14 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
   }
 
   Future<void> deleteItem(String id) async {
-    final items = state.value ?? [];
+    final items = _items;
     final updated = items.where((item) => item.id != id).toList();
     state = AsyncData(updated);
     await _save(updated);
   }
 
   Future<void> resetAllToFull() async {
-    final items = state.value ?? [];
+    final items = _items;
     final now = DateTime.now();
     final updated = items
         .map((item) =>
@@ -91,7 +97,7 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
   }
 
   Future<void> restoreDefaults() async {
-    final items = state.value ?? [];
+    final items = _items;
     final existingNames = items.map((e) => e.name).toSet();
     final defaults = buildDefaultItems()
         .where((d) => !existingNames.contains(d.name))
