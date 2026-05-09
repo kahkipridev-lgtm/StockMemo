@@ -70,7 +70,6 @@ class _ThemeSetting extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      leading: const Icon(Icons.palette_rounded),
       title: const Text('テーマ'),
       trailing: SegmentedButton<ThemeMode>(
         segments: const [
