@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/inventory_provider.dart';
 import '../providers/settings_provider.dart';
+
+const _kSupportUrl = 'https://kahkipridev-lgtm.github.io/StockMemo/';
+const _kPrivacyUrl = 'https://kahkipridev-lgtm.github.io/StockMemo/privacy.html';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -34,6 +38,16 @@ class SettingsScreen extends ConsumerWidget {
               leading: Icon(Icons.info_outline_rounded),
               title: Text('バージョン'),
               trailing: Text('1.0.0', style: TextStyle(color: Colors.grey)),
+            ),
+            const _LinkTile(
+              icon: Icons.help_outline_rounded,
+              title: 'サポート',
+              url: _kSupportUrl,
+            ),
+            const _LinkTile(
+              icon: Icons.privacy_tip_outlined,
+              title: 'プライバシーポリシー',
+              url: _kPrivacyUrl,
             ),
           ],
         ),
@@ -212,6 +226,37 @@ class _RestoreDefaultsTile extends ConsumerWidget {
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('デフォルトアイテムを復元しました')),
+            );
+          }
+        }
+      },
+    );
+  }
+}
+
+class _LinkTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String url;
+
+  const _LinkTile({
+    required this.icon,
+    required this.title,
+    required this.url,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      trailing: const Icon(Icons.open_in_new_rounded, size: 18, color: Colors.grey),
+      onTap: () async {
+        final uri = Uri.parse(url);
+        if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('ページを開けませんでした')),
             );
           }
         }
