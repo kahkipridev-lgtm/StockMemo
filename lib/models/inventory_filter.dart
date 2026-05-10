@@ -13,8 +13,7 @@ class InventoryFilter {
       if (levels!.length == 1 && levels!.first == StockLevel.empty) {
         return '在庫切れ';
       }
-      if (levels!.contains(StockLevel.low) &&
-          levels!.contains(StockLevel.empty)) {
+      if (levels!.length == 1 && levels!.first == StockLevel.low) {
         return '残りわずか';
       }
     }

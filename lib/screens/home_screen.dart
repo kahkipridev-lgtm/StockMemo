@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
           GenreSelectionScreen(),
           InventoryScreen(
             key: ValueKey('low'),
-            filter: InventoryFilter(levels: [StockLevel.low, StockLevel.empty]),
+            filter: InventoryFilter(levels: [StockLevel.low]),
           ),
           InventoryScreen(
             key: ValueKey('empty'),
