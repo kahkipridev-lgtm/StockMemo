@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockMemo — サポート / Support</title>
+  <meta name="description" content="StockMemo（家庭の在庫管理アプリ）のサポートページ。使い方・よくある質問・お問い合わせ。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">StockMemo</a>
+    <nav class="nav-links">
+      <a href="index.html">サポート</a>
+      <a href="privacy.html">プライバシーポリシー</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="app-icon">📦</div>
+  <h1>StockMemo</h1>
+  <p class="tagline">家庭の在庫管理アプリ</p>
+  <p class="tagline-en">Household Inventory Management App</p>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('ja')">日本語</button>
+    <button class="lang-btn"        onclick="setLang('en')">English</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- ========== 日本語 ========== -->
+  <div data-lang="ja">
+
+    <section>
+      <p class="section-label">アプリについて</p>
+      <h2>StockMemoとは？</h2>
+      <p style="color:var(--text-secondary);font-size:16px;margin-bottom:24px;">
+        「醤油がなくなりそう」「シャンプーを買い忘れた」——そんなお悩みを解決する、シンプルな家庭用在庫管理アプリです。
+        調味料・台所・風呂・トイレ・洗面所・洗濯・その他など、カテゴリ別に日用品の残量を手軽に記録できます。
+      </p>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">📋</div>
+          <h3>カテゴリ別に管理</h3>
+          <p>調味料や生活用品を7つのカテゴリに整理。必要なアイテムがすぐ見つかります。</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚠️</div>
+          <h3>残量を3段階で記録</h3>
+          <p>「買ったばっかり」「残りわずか」「在庫切れ」の3段階で残量を直感的に管理。</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛒</div>
+          <h3>買い物リスト自動生成</h3>
+          <p>「在庫切れ」のアイテムから買い物リストを自動でまとめます。</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>データは端末内に保存</h3>
+          <p>入力した在庫データはすべてデバイス内にのみ保存。クラウドやサーバーには送信しません。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-label">使い方</p>
+      <h2>かんたんな使い方</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>アプリを起動してカテゴリを選ぶ</h3>
+            <p>ホーム画面には「調味料」「台所」など7つのカテゴリが表示されます。管理したいカテゴリをタップしてください。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>アイテムの残量を更新する</h3>
+            <p>各アイテムをタップすると残量が切り替わります（買ったばっかり → 残りわずか → 在庫切れ → 買ったばっかり）。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>オリジナルアイテムを追加する</h3>
+            <p>各カテゴリ画面の「＋」ボタンから、自分だけのアイテムを追加できます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>買い物リストを確認する</h3>
+            <p>下部の「買い物リスト」タブを開くと、在庫切れのアイテムが一覧表示されます。</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>「残りわずか」フィルターで先読みチェック</h3>
+            <p>「残りわずか」タブで、もうすぐ切れそうなアイテムをまとめて確認できます。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-label">よくある質問</p>
+      <h2>FAQ</h2>
+      <div class="faq-list">
+        <details>
+          <summary>データはどこに保存されますか？</summary>
+          <p class="answer">すべてのデータはお使いのiPhone・iPad内にのみ保存されます。クラウドやサーバーへの送信は一切行いません。</p>
+        </details>
+        <details>
+          <summary>iCloudでバックアップされますか？</summary>
+          <p class="answer">アプリのデータはiOSのバックアップ対象に含まれる場合があります（OSの設定に依存）。ただし、StockMemo自体がiCloudに同期する機能は持っていません。</p>
+        </details>
+        <details>
+          <summary>アイテムを間違えて削除してしまいました</summary>
+          <p class="answer">削除したアイテムは元に戻せません。ただし、デフォルトアイテムは「設定 → デフォルトアイテムを復元」から再登録できます。</p>
+        </details>
+        <details>
+          <summary>カテゴリを追加・変更できますか？</summary>
+          <p class="answer">現在のバージョンでは、7つの組み込みカテゴリが固定されています。カスタムカテゴリ機能は今後のアップデートを予定しています。</p>
+        </details>
+        <details>
+          <summary>全データをリセットしたい</summary>
+          <p class="answer">「設定」画面の「全データをリセット」をタップすると、すべてのアイテムの残量を「買ったばっかり」の状態に戻すことができます。アイテム自体は削除されません。</p>
+        </details>
+        <details>
+          <summary>複数のデバイスで同期できますか？</summary>
+          <p class="answer">現在のバージョンはデバイス間の同期機能を持っていません。データは端末内にのみ保存されます。</p>
+        </details>
+        <details>
+          <summary>無料で使えますか？</summary>
+          <p class="answer">StockMemoは無料でご利用いただけます。アプリ内課金・サブスクリプションはありません。近日中に広告が表示される予定です。</p>
+        </details>
+      </div>
+    </section>
+
+    <section>
+      <div class="contact-box">
+        <h2>お問い合わせ</h2>
+        <p>ご不明な点・バグ報告・ご要望は、メールでお気軽にご連絡ください。</p>
+        <a class="contact-btn" href="mailto:kahki.pridev@gmail.com">メールを送る</a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ========== English ========== -->
+  <div data-lang="en">
+
+    <section>
+      <p class="section-label">About the App</p>
+      <h2>What is StockMemo?</h2>
+      <p style="color:var(--text-secondary);font-size:16px;margin-bottom:24px;">
+        "Is the soy sauce running low?" "I forgot to buy shampoo again." StockMemo solves these everyday
+        problems with a simple household inventory tracker. Record stock levels for kitchen supplies,
+        bathroom products, condiments, and more — all organized by category.
+      </p>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-icon">📋</div>
+          <h3>Organized by Category</h3>
+          <p>Keep items tidy across 7 built-in categories: Condiments, Kitchen, Bath, Toilet, Washroom, Laundry, and Other.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">⚠️</div>
+          <h3>3-Level Stock Tracking</h3>
+          <p>Full, Low, or Out of Stock — tap any item to cycle through the three states instantly.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🛒</div>
+          <h3>Auto Shopping List</h3>
+          <p>All "Out of Stock" items are automatically collected into a ready-to-use shopping list.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">🔒</div>
+          <h3>Data Stays on Device</h3>
+          <p>Your inventory data is stored only on your device — never sent to servers or the cloud.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-label">How to Use</p>
+      <h2>Getting Started</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>Open the app and choose a category</h3>
+            <p>The home screen shows all 7 categories. Tap the one you want to manage.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Update stock levels</h3>
+            <p>Tap any item to cycle its status: Full → Low → Out of Stock → Full.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>Add your own items</h3>
+            <p>Use the "+" button in any category to add custom items.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h3>Check your shopping list</h3>
+            <p>Tap the "Shopping List" tab at the bottom to see all out-of-stock items in one place.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h3>Plan ahead with the "Low" filter</h3>
+            <p>The "Low" tab shows everything running short so you can stock up before you run out.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <p class="section-label">Frequently Asked Questions</p>
+      <h2>FAQ</h2>
+      <div class="faq-list">
+        <details>
+          <summary>Where is my data stored?</summary>
+          <p class="answer">All data is stored exclusively on your iPhone or iPad. Nothing is ever sent to a server or the cloud.</p>
+        </details>
+        <details>
+          <summary>Is my data backed up to iCloud?</summary>
+          <p class="answer">StockMemo data may be included in standard iOS device backups depending on your iCloud settings. StockMemo itself does not sync to iCloud.</p>
+        </details>
+        <details>
+          <summary>I accidentally deleted an item. Can I recover it?</summary>
+          <p class="answer">Deleted items cannot be recovered. However, built-in default items can be restored via Settings → Restore Defaults.</p>
+        </details>
+        <details>
+          <summary>Can I add or customize categories?</summary>
+          <p class="answer">The current version has 7 fixed built-in categories. Custom category support is planned for a future update.</p>
+        </details>
+        <details>
+          <summary>How do I reset everything?</summary>
+          <p class="answer">Go to Settings and tap "Reset All Data" to set every item back to "Full" status. Your items will not be deleted.</p>
+        </details>
+        <details>
+          <summary>Can I sync across multiple devices?</summary>
+          <p class="answer">Multi-device sync is not available in the current version. Data is stored locally on the device only.</p>
+        </details>
+        <details>
+          <summary>Is StockMemo free?</summary>
+          <p class="answer">StockMemo is free to use. There are no in-app purchases or subscriptions. The app will display advertisements.</p>
+        </details>
+      </div>
+    </section>
+
+    <section>
+      <div class="contact-box">
+        <h2>Contact Us</h2>
+        <p>Have a question, found a bug, or want to request a feature? We'd love to hear from you.</p>
+        <a class="contact-btn" href="mailto:kahki.pridev@gmail.com">Send an Email</a>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-links">
+    <a href="index.html">サポート / Support</a>
+    <a href="privacy.html">プライバシーポリシー / Privacy Policy</a>
+  </div>
+  <p>© 2025 StockMemo. All rights reserved.</p>
+</footer>
+
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      el.style.display = el.dataset.lang === lang ? 'block' : 'none';
+    });
+    document.querySelectorAll('.lang-btn').forEach((btn, i) => {
+      btn.classList.toggle('active', ['ja','en'][i] === lang);
+    });
+    document.documentElement.lang = lang;
+    localStorage.setItem('stockmemo-lang', lang);
+  }
+  const saved = localStorage.getItem('stockmemo-lang');
+  if (saved === 'en') setLang('en');
+</script>
+
+</body>
+</html>
