@@ -61,12 +61,12 @@ class _HomeScreenState extends State<HomeScreen> {
           NavigationDestination(
             icon: const Icon(Icons.warning_amber_outlined, color: Color(0xFFA86400)),
             selectedIcon: const Icon(Icons.warning_amber_rounded, color: Color(0xFFA86400)),
-            label: '残量少を確認',
+            label: '残りわずか',
           ),
           NavigationDestination(
             icon: const Icon(Icons.remove_circle_outline_rounded, color: Color(0xFFC0392B)),
             selectedIcon: const Icon(Icons.remove_circle_rounded, color: Color(0xFFC0392B)),
-            label: '残量なしを確認',
+            label: '在庫切れ',
           ),
           const NavigationDestination(
             icon: Icon(Icons.shopping_cart_outlined, color: Color(0xFF2E7D32)),

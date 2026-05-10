@@ -15,7 +15,7 @@ enum StockLevel {
       next: StockLevel.low,
     ),
     StockLevel.low: _Meta(
-      label: '残量少',
+      label: '残りわずか',
       color: Color(0xFF9B6000),
       backgroundColor: Color(0xFFFFF8ED),
       icon: Icons.warning_amber_rounded,
@@ -23,7 +23,7 @@ enum StockLevel {
       next: StockLevel.empty,
     ),
     StockLevel.empty: _Meta(
-      label: '残量なし',
+      label: '在庫切れ',
       color: Color(0xFFC0392B),
       backgroundColor: Color(0xFFFDECEA),
       icon: Icons.remove_circle_rounded,

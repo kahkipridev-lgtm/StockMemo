@@ -11,11 +11,11 @@ class InventoryFilter {
     if (genre != null) return genre!.label;
     if (levels != null) {
       if (levels!.length == 1 && levels!.first == StockLevel.empty) {
-        return '残量なし';
+        return '在庫切れ';
       }
       if (levels!.contains(StockLevel.low) &&
           levels!.contains(StockLevel.empty)) {
-        return '残量少';
+        return '残りわずか';
       }
     }
     return '全ての在庫';
