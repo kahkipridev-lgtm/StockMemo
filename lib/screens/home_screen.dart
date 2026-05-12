@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/inventory_filter.dart';
 import '../models/stock_level.dart';
+import '../widgets/banner_ad_widget.dart';
 import 'genre_selection_screen.dart';
 import 'inventory_screen.dart';
 import 'settings_screen.dart';
@@ -32,20 +33,27 @@ class _HomeScreenState extends State<HomeScreen> {
         : colorScheme.secondary;
 
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: const [
-          GenreSelectionScreen(),
-          InventoryScreen(
-            key: ValueKey('low'),
-            filter: InventoryFilter(levels: [StockLevel.low]),
+      body: Column(
+        children: [
+          Expanded(
+            child: IndexedStack(
+              index: _currentIndex,
+              children: const [
+                GenreSelectionScreen(),
+                InventoryScreen(
+                  key: ValueKey('low'),
+                  filter: InventoryFilter(levels: [StockLevel.low]),
+                ),
+                InventoryScreen(
+                  key: ValueKey('empty'),
+                  filter: InventoryFilter(levels: [StockLevel.empty]),
+                ),
+                ShoppingListScreen(),
+                SettingsScreen(),
+              ],
+            ),
           ),
-          InventoryScreen(
-            key: ValueKey('empty'),
-            filter: InventoryFilter(levels: [StockLevel.empty]),
-          ),
-          ShoppingListScreen(),
-          SettingsScreen(),
+          const BannerAdWidget(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
