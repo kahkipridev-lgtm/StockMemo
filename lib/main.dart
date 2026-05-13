@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +15,16 @@ import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isIOS) {
+    final status = await AppTrackingTransparency.requestTrackingAuthorization();
+    if (status != TrackingStatus.authorized) {
+      MobileAds.instance.updateRequestConfiguration(
+        RequestConfiguration(tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified),
+      );
+    }
+  }
+
   await MobileAds.instance.initialize();
   if (kDebugMode) {
     MobileAds.instance.updateRequestConfiguration(
