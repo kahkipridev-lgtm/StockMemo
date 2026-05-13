@@ -1,4 +1,8 @@
+import 'dart:io';
+
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'home_screen.dart';
 
@@ -34,19 +38,34 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const HomeScreen(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-                FadeTransition(opacity: animation, child: child),
-            transitionDuration: const Duration(milliseconds: 600),
-          ),
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _requestTrackingAndNavigate();
+    });
+  }
+
+  Future<void> _requestTrackingAndNavigate() async {
+    if (Platform.isIOS) {
+      await Future.delayed(const Duration(milliseconds: 200));
+      final status = await AppTrackingTransparency.requestTrackingAuthorization();
+      if (status != TrackingStatus.authorized) {
+        MobileAds.instance.updateRequestConfiguration(
+          RequestConfiguration(tagForUnderAgeOfConsent: TagForUnderAgeOfConsent.unspecified),
         );
       }
-    });
+    }
+
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const HomeScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+              FadeTransition(opacity: animation, child: child),
+          transitionDuration: const Duration(milliseconds: 600),
+        ),
+      );
+    }
   }
 
   @override
