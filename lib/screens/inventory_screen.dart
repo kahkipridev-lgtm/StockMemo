@@ -12,8 +12,9 @@ import '../widgets/sort_bar.dart';
 
 class InventoryScreen extends ConsumerStatefulWidget {
   final InventoryFilter? filter;
+  final bool isActive;
 
-  const InventoryScreen({super.key, this.filter});
+  const InventoryScreen({super.key, this.filter, this.isActive = true});
 
   @override
   ConsumerState<InventoryScreen> createState() => _InventoryScreenState();
@@ -22,6 +23,18 @@ class InventoryScreen extends ConsumerStatefulWidget {
 class _InventoryScreenState extends ConsumerState<InventoryScreen> {
   late SortOrder _sortOrder;
   bool _sortInitialized = false;
+
+  // 表示中に対象から外れたアイテムも、他画面へ遷移するまではこの画面に残す
+  Set<String>? _pinnedIds;
+  Set<String> _lastMatchingIds = {};
+
+  @override
+  void didUpdateWidget(InventoryScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive && !oldWidget.isActive) {
+      _pinnedIds = null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +65,23 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('エラー: $e')),
         data: (items) {
-          final filtered = filterItems(items, filter);
+          final matching = filterItems(items, filter);
+          final matchingIds = matching.map((e) => e.id).toSet();
+
+          if (_pinnedIds == null) {
+            _pinnedIds = {};
+          } else {
+            for (final id in _lastMatchingIds) {
+              if (!matchingIds.contains(id)) _pinnedIds!.add(id);
+            }
+          }
+          _lastMatchingIds = matchingIds;
+
+          final filtered = items
+              .where((item) =>
+                  matchingIds.contains(item.id) ||
+                  _pinnedIds!.contains(item.id))
+              .toList();
           final sorted = sortItems(filtered, _sortOrder);
 
           return Column(

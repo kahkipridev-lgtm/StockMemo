@@ -48,18 +48,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Expanded(
             child: IndexedStack(
               index: _currentIndex,
-              children: const [
-                GenreSelectionScreen(),
+              children: [
+                const GenreSelectionScreen(),
                 InventoryScreen(
-                  key: ValueKey('low'),
-                  filter: InventoryFilter(levels: [StockLevel.low]),
+                  key: const ValueKey('low'),
+                  filter: const InventoryFilter(levels: [StockLevel.low]),
+                  isActive: _currentIndex == 1,
                 ),
                 InventoryScreen(
-                  key: ValueKey('empty'),
-                  filter: InventoryFilter(levels: [StockLevel.empty]),
+                  key: const ValueKey('empty'),
+                  filter: const InventoryFilter(levels: [StockLevel.empty]),
+                  isActive: _currentIndex == 2,
                 ),
-                ShoppingListScreen(),
-                SettingsScreen(),
+                const ShoppingListScreen(),
+                const SettingsScreen(),
               ],
             ),
           ),
