@@ -34,6 +34,7 @@ class SettingsScreen extends ConsumerWidget {
             _RestoreDefaultsTile(),
             const Divider(),
             _SectionHeader(title: 'アプリについて'),
+            const _DeveloperMessagesTile(),
             const ListTile(
               leading: Icon(Icons.info_outline_rounded),
               title: Text('バージョン'),
@@ -229,6 +230,22 @@ class _RestoreDefaultsTile extends ConsumerWidget {
             );
           }
         }
+      },
+    );
+  }
+}
+
+class _DeveloperMessagesTile extends StatelessWidget {
+  const _DeveloperMessagesTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.campaign_outlined),
+      title: const Text('開発者からのメッセージ'),
+      trailing: const Icon(Icons.chevron_right_rounded, color: Colors.grey),
+      onTap: () {
+        Navigator.of(context).pushNamed('/developer_messages');
       },
     );
   }

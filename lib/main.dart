@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'providers/settings_provider.dart';
+import 'screens/developer_messages_screen.dart';
 import 'screens/genre_selection_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/inventory_screen.dart';
@@ -62,6 +63,7 @@ class StockMemoApp extends ConsumerWidget {
         '/genres': (_) => const GenreSelectionScreen(),
         '/inventory': (_) => const InventoryScreen(),
         '/settings': (_) => const SettingsScreen(),
+        '/developer_messages': (_) => const DeveloperMessagesScreen(),
       },
     );
   }
