@@ -8,11 +8,30 @@ import '../providers/developer_messages_provider.dart';
 
 final _urlPattern = RegExp(r'https?://[^\s)]+');
 
-class DeveloperMessagesScreen extends ConsumerWidget {
+class DeveloperMessagesScreen extends ConsumerStatefulWidget {
   const DeveloperMessagesScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DeveloperMessagesScreen> createState() =>
+      _DeveloperMessagesScreenState();
+}
+
+class _DeveloperMessagesScreenState
+    extends ConsumerState<DeveloperMessagesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(developerMessagesProvider.future).then((messages) {
+      if (messages.isNotEmpty) {
+        ref
+            .read(developerMessagesReadProvider.notifier)
+            .markLatestAsRead(messages.first.version);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final messagesAsync = ref.watch(developerMessagesProvider);
 
     return Scaffold(
