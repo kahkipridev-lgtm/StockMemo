@@ -73,6 +73,16 @@ class ShoppingListNotifier extends AsyncNotifier<List<ShoppingItem>> {
     await _save(updated);
   }
 
+  Future<void> updateItemName(String id, String name) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return;
+    final updated = _sorted(
+      _items.map((item) => item.id == id ? item.copyWith(name: trimmed) : item).toList(),
+    );
+    state = AsyncData(updated);
+    await _save(updated);
+  }
+
   Future<void> clearPurchased() async {
     final updated = _items.where((item) => !item.isPurchased).toList();
     state = AsyncData(updated);
