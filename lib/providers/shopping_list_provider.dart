@@ -56,13 +56,11 @@ class ShoppingListNotifier extends AsyncNotifier<List<ShoppingItem>> {
   }
 
   Future<void> togglePurchased(String id) async {
-    final updated = _sorted(
-      _items
-          .map((item) => item.id == id
-              ? item.copyWith(isPurchased: !item.isPurchased)
-              : item)
-          .toList(),
-    );
+    final updated = _items
+        .map((item) => item.id == id
+            ? item.copyWith(isPurchased: !item.isPurchased)
+            : item)
+        .toList();
     state = AsyncData(updated);
     await _save(updated);
   }
