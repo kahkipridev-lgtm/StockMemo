@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'providers/settings_provider.dart';
@@ -44,7 +43,7 @@ class StockMemoApp extends ConsumerWidget {
           brightness: Brightness.light,
         ),
         useMaterial3: true,
-        textTheme: GoogleFonts.zenMaruGothicTextTheme(),
+        fontFamily: 'ZenMaruGothic',
       ),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -52,9 +51,7 @@ class StockMemoApp extends ConsumerWidget {
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
-        textTheme: GoogleFonts.zenMaruGothicTextTheme(
-          ThemeData(brightness: Brightness.dark).textTheme,
-        ),
+        fontFamily: 'ZenMaruGothic',
       ),
       initialRoute: '/',
       routes: {
