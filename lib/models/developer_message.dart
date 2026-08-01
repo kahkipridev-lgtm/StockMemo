@@ -16,7 +16,7 @@ class DeveloperMessage {
       version: json['version'] as String,
       date: json['date'] as String,
       title: json['title'] as String,
-      body: json['body'] as String,
+      body: (json['body'] as List).cast<String>().join('\n'),
     );
   }
 }
