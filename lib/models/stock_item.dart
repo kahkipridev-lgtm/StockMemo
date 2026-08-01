@@ -3,6 +3,7 @@ import 'stock_level.dart';
 class StockItem {
   final String id;
   final String name;
+  final String? yomi;
   final String genreId;
   final StockLevel stockLevel;
   final bool isDefault;
@@ -11,6 +12,7 @@ class StockItem {
   const StockItem({
     required this.id,
     required this.name,
+    this.yomi,
     required this.genreId,
     this.stockLevel = StockLevel.full,
     this.isDefault = false,
@@ -20,6 +22,7 @@ class StockItem {
   StockItem copyWith({
     String? id,
     String? name,
+    String? yomi,
     String? genreId,
     StockLevel? stockLevel,
     bool? isDefault,
@@ -28,6 +31,7 @@ class StockItem {
     return StockItem(
       id: id ?? this.id,
       name: name ?? this.name,
+      yomi: yomi ?? this.yomi,
       genreId: genreId ?? this.genreId,
       stockLevel: stockLevel ?? this.stockLevel,
       isDefault: isDefault ?? this.isDefault,
@@ -39,6 +43,7 @@ class StockItem {
     return {
       'id': id,
       'name': name,
+      if (yomi != null) 'yomi': yomi,
       'genre': genreId,
       'stockLevel': stockLevel.toJson(),
       'isDefault': isDefault,
@@ -50,6 +55,7 @@ class StockItem {
     return StockItem(
       id: json['id'] as String,
       name: json['name'] as String,
+      yomi: json['yomi'] as String?,
       genreId: json['genre'] as String,
       stockLevel: StockLevel.fromJson(json['stockLevel'] as String),
       isDefault: json['isDefault'] as bool? ?? false,

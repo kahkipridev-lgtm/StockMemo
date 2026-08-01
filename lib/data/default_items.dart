@@ -3,44 +3,73 @@ import '../models/stock_item.dart';
 import '../models/stock_level.dart';
 
 List<StockItem> buildDefaultItems({DateTime? installedAt}) {
-  final kitchenItems = [
-    'キッチンペーパー', 'ラップ', 'アルミホイル', 'ゴミ袋',
-    '食器洗い洗剤', 'スポンジ',
+  // (name, yomi) — yomiはnullでもOK（カタカナ・ひらがなのみの場合は検索時に正規化で対応）
+  final kitchenItems = <(String, String?)>[
+    ('キッチンペーパー', null),
+    ('ラップ', null),
+    ('アルミホイル', null),
+    ('ゴミ袋', 'ごみぶくろ'),
+    ('食器洗い洗剤', 'しょっきあらいせんざい'),
+    ('スポンジ', null),
   ];
 
-  final condimentItems = [
-    '醤油', '味噌', '砂糖', '塩', '酢', 'みりん', '料理酒',
-    'サラダ油', 'ごま油', 'だしの素', 'コンソメ',
+  final condimentItems = <(String, String?)>[
+    ('醤油', 'しょうゆ'),
+    ('味噌', 'みそ'),
+    ('砂糖', 'さとう'),
+    ('塩', 'しお'),
+    ('酢', 'す'),
+    ('みりん', null),
+    ('料理酒', 'りょうりしゅ'),
+    ('サラダ油', 'さらだゆ'),
+    ('ごま油', 'ごまあぶら'),
+    ('だしの素', 'だしのもと'),
+    ('コンソメ', null),
   ];
 
-  final bathItems = [
-    'シャンプー', 'コンディショナー', 'ボディソープ', '入浴剤',
+  final bathItems = <(String, String?)>[
+    ('シャンプー', null),
+    ('コンディショナー', null),
+    ('ボディソープ', null),
+    ('入浴剤', 'にゅうよくざい'),
   ];
 
-  final toiletItems = [
-    'トイレットペーパー', 'トイレ洗剤', 'トイレブラシ', '消臭スプレー',
+  final toiletItems = <(String, String?)>[
+    ('トイレットペーパー', null),
+    ('トイレ洗剤', 'とわいれせんざい'),
+    ('トイレブラシ', null),
+    ('消臭スプレー', 'しょうしゅうすぷれー'),
   ];
 
-  final washroomItems = [
-    '歯磨き粉', '歯ブラシ', '洗顔料', 'ハンドソープ',
+  final washroomItems = <(String, String?)>[
+    ('歯磨き粉', 'はみがきこ'),
+    ('歯ブラシ', 'はぶらし'),
+    ('洗顔料', 'せんがんりょう'),
+    ('ハンドソープ', null),
   ];
 
-  final laundryItems = [
-    '洗濯洗剤', '柔軟剤', '漂白剤',
+  final laundryItems = <(String, String?)>[
+    ('洗濯洗剤', 'せんたくせんざい'),
+    ('柔軟剤', 'じゅうなんざい'),
+    ('漂白剤', 'ひょうはくざい'),
   ];
 
-  final otherItems = [
-    'ティッシュ', 'マスク', '除菌スプレー', '電池',
+  final otherItems = <(String, String?)>[
+    ('ティッシュ', null),
+    ('マスク', null),
+    ('除菌スプレー', 'じょきんすぷれー'),
+    ('電池', 'でんち'),
   ];
 
   int counter = 0;
 
-  List<StockItem> makeItems(List<String> names, String genreId) {
-    return names.map((name) {
+  List<StockItem> makeItems(List<(String, String?)> items, String genreId) {
+    return items.map((item) {
       final id = 'default_${counter++}';
       return StockItem(
         id: id,
-        name: name,
+        name: item.$1,
+        yomi: item.$2,
         genreId: genreId,
         stockLevel: StockLevel.full,
         isDefault: true,

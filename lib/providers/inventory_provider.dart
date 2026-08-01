@@ -35,12 +35,36 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
 
     try {
       final list = jsonDecode(raw) as List<dynamic>;
-      return list
+      final items = list
           .map((e) => StockItem.fromJson(e as Map<String, dynamic>))
           .toList();
+      return _applyDefaultYomi(items);
     } catch (_) {
       return [];
     }
+  }
+
+  // yomiが未設定のアイテムにデフォルトの読みを付与する（アプリ更新後の既存データ対応）
+  List<StockItem> _applyDefaultYomi(List<StockItem> items) {
+    final yomiMap = {
+      for (final d in buildDefaultItems())
+        if (d.yomi != null) d.name: d.yomi!
+    };
+    final patched = items.map((item) {
+      if (item.yomi == null && yomiMap.containsKey(item.name)) {
+        return item.copyWith(yomi: yomiMap[item.name]);
+      }
+      return item;
+    }).toList();
+
+    // 変更があった場合は保存する
+    final hasChanges = patched.any((item) =>
+        item.yomi != null &&
+        items.firstWhere((i) => i.id == item.id).yomi == null);
+    if (hasChanges) {
+      _save(patched);
+    }
+    return patched;
   }
 
   Future<void> _save(List<StockItem> items) async {
@@ -63,11 +87,12 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     await _save(updated);
   }
 
-  Future<void> addItem(String name, String genreId) async {
+  Future<void> addItem(String name, String genreId, {String? yomi}) async {
     final items = _items;
     final newItem = StockItem(
       id: _uuid.v4(),
       name: name,
+      yomi: yomi?.isEmpty == true ? null : yomi,
       genreId: genreId,
       stockLevel: StockLevel.full,
       isDefault: false,

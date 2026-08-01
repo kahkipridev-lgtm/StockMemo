@@ -15,7 +15,8 @@ class AddItemDialog extends ConsumerStatefulWidget {
 }
 
 class _AddItemDialogState extends ConsumerState<AddItemDialog> {
-  final _controller = TextEditingController();
+  final _nameController = TextEditingController();
+  final _yomiController = TextEditingController();
   late Genre _selectedGenre;
   final _formKey = GlobalKey<FormState>();
 
@@ -27,7 +28,8 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
 
   @override
   void dispose() {
-    _controller.dispose();
+    _nameController.dispose();
+    _yomiController.dispose();
     super.dispose();
   }
 
@@ -48,7 +50,7 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextFormField(
-              controller: _controller,
+              controller: _nameController,
               autofocus: true,
               decoration: const InputDecoration(
                 labelText: 'アイテム名',
@@ -61,6 +63,15 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _yomiController,
+              decoration: const InputDecoration(
+                labelText: 'よみ（任意）',
+                border: OutlineInputBorder(),
+                hintText: '例：しょうゆ',
+              ),
             ),
             const SizedBox(height: 16),
             const Text('ジャンル', style: TextStyle(fontSize: 12, color: Colors.grey)),
@@ -110,9 +121,12 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    ref
-        .read(inventoryProvider.notifier)
-        .addItem(_controller.text.trim(), _selectedGenre.id);
+    final yomi = _yomiController.text.trim();
+    ref.read(inventoryProvider.notifier).addItem(
+          _nameController.text.trim(),
+          _selectedGenre.id,
+          yomi: yomi.isEmpty ? null : yomi,
+        );
     Navigator.of(context).pop();
   }
 }
