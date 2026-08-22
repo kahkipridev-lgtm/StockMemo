@@ -3,7 +3,16 @@
     "allow": [
       "Bash(flutter analyze *)",
       "Bash(flutter build *)",
-      "Bash(gh *)"
+      "Bash(gh *)",
+      "Bash(xcode-select -p)",
+      "Bash(xcodebuild -version)",
+      "Bash(swift --version)",
+      "Bash(plutil -convert xml1 -o - /Users/mrkzk/Desktop/StockMemo/ios/Runner/Info.plist)",
+      "Bash(python3 *)",
+      "Bash(xcrun simctl *)",
+      "Bash(brew list *)",
+      "Bash(pip3 install *)",
+      "Bash(sips -c 200 920 -o tabbar_crop.png font_check.png)"
     ]
   },
   "hooks": {

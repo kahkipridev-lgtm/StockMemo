@@ -1,4 +1,8 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/inventory_filter.dart';
@@ -19,6 +23,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  static const _nativeTabBarChannel = MethodChannel('com.stockmemo.app/native_tab_bar');
+
+  // iOS 26のLiquid Glassタブバーを使うため、ネイティブ実装(RootFlutterViewController)側で
+  // 下部タブを描画する。Flutter側のNavigationBarはiOS以外でのみ使う。
+  final bool _useNativeTabBar = Platform.isIOS;
+
   int _currentIndex = 0;
 
   static const _tabColors = [
@@ -27,6 +37,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Color(0xFFC0392B),
     Color(0xFF2E7D32),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    if (_useNativeTabBar) {
+      _nativeTabBarChannel.setMethodCallHandler(_handleNativeTabBarCall);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_useNativeTabBar) {
+      _nativeTabBarChannel.setMethodCallHandler(null);
+    }
+    super.dispose();
+  }
+
+  Future<void> _handleNativeTabBarCall(MethodCall call) async {
+    if (call.method != 'tabSelected') return;
+    final index = (call.arguments as Map)['index'] as int;
+    setState(() => _currentIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +73,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final emptyCount =
         items.where((item) => item.stockLevel == StockLevel.empty).length;
     final hasUnreadMessage = ref.watch(hasUnreadDeveloperMessageProvider);
+
+    if (_useNativeTabBar) {
+      unawaited(
+        _nativeTabBarChannel.invokeMethod('updateBadges', {
+          'low': lowCount,
+          'empty': emptyCount,
+          'hasUnread': hasUnreadMessage,
+        }),
+      );
+    }
 
     return Scaffold(
       body: Column(
@@ -66,9 +108,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
           const BannerAdWidget(),
+          if (_useNativeTabBar)
+            SizedBox(height: 49 + MediaQuery.of(context).padding.bottom),
         ],
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: _useNativeTabBar ? null : NavigationBar(
         selectedIndex: _currentIndex,
         indicatorColor: indicatorColor.withValues(alpha: 0.2),
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
