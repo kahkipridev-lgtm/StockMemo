@@ -38,7 +38,12 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
       final items = list
           .map((e) => StockItem.fromJson(e as Map<String, dynamic>))
           .toList();
-      return _applyDefaultYomi(items);
+      final patched = _applyDefaultYomi(items);
+      // 廃止した"残りわずか"(low)を保存していた既存データを在庫切れとして保存し直す（アプリ更新後の既存データ対応）
+      if (raw.contains('"stockLevel":"low"')) {
+        await _save(patched);
+      }
+      return patched;
     } catch (_) {
       return [];
     }

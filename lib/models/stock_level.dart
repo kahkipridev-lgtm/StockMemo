@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 enum StockLevel {
   full,
-  low,
   empty;
 
   static const _metadata = {
@@ -11,14 +10,6 @@ enum StockLevel {
       color: Color(0xFF357A45),
       backgroundColor: Color(0xFFEDF6E9),
       icon: Icons.check_circle_rounded,
-      sortOrder: 2,
-      next: StockLevel.low,
-    ),
-    StockLevel.low: _Meta(
-      label: '残りわずか',
-      color: Color(0xFF9B6000),
-      backgroundColor: Color(0xFFFFF8ED),
-      icon: Icons.warning_amber_rounded,
       sortOrder: 1,
       next: StockLevel.empty,
     ),
@@ -42,6 +33,7 @@ enum StockLevel {
   String toJson() => name;
 
   static StockLevel fromJson(String value) {
+    if (value == 'low') return StockLevel.empty; // 旧「残りわずか」データを在庫切れとして扱う
     return StockLevel.values.firstWhere(
       (e) => e.name == value,
       orElse: () => StockLevel.full,

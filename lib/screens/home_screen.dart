@@ -33,7 +33,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   static const _tabColors = [
     Color(0xFF7A5100),
-    Color(0xFFA86400),
     Color(0xFFC0392B),
     Color(0xFF2E7D32),
   ];
@@ -57,6 +56,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _handleNativeTabBarCall(MethodCall call) async {
     if (call.method != 'tabSelected') return;
     final index = (call.arguments as Map)['index'] as int;
+    // ジャンル選択などでプッシュされた画面がホーム画面の上に残っていると
+    // タブ切替後もその画面が表示されたままになるため、ホームまで戻す
+    Navigator.of(context).popUntil((route) => route.isFirst);
     setState(() => _currentIndex = index);
   }
 
@@ -68,8 +70,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         : colorScheme.secondary;
 
     final items = ref.watch(inventoryProvider).value ?? [];
-    final lowCount =
-        items.where((item) => item.stockLevel == StockLevel.low).length;
     final emptyCount =
         items.where((item) => item.stockLevel == StockLevel.empty).length;
     final hasUnreadMessage = ref.watch(hasUnreadDeveloperMessageProvider);
@@ -77,7 +77,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (_useNativeTabBar) {
       unawaited(
         _nativeTabBarChannel.invokeMethod('updateBadges', {
-          'low': lowCount,
           'empty': emptyCount,
           'hasUnread': hasUnreadMessage,
         }),
@@ -93,14 +92,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               children: [
                 const GenreSelectionScreen(),
                 InventoryScreen(
-                  key: const ValueKey('low'),
-                  filter: const InventoryFilter(levels: [StockLevel.low]),
-                  isActive: _currentIndex == 1,
-                ),
-                InventoryScreen(
                   key: const ValueKey('empty'),
                   filter: const InventoryFilter(levels: [StockLevel.empty]),
-                  isActive: _currentIndex == 2,
+                  isActive: _currentIndex == 1,
                 ),
                 const ShoppingListScreen(),
                 const SettingsScreen(),
@@ -121,19 +115,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: const Icon(Icons.category_outlined, color: Color(0xFF7A5100)),
             selectedIcon: const Icon(Icons.category_rounded, color: Color(0xFF7A5100)),
             label: '在庫を確認',
-          ),
-          NavigationDestination(
-            icon: Badge(
-              label: Text('$lowCount'),
-              isLabelVisible: lowCount > 0,
-              child: const Icon(Icons.warning_amber_outlined, color: Color(0xFFA86400)),
-            ),
-            selectedIcon: Badge(
-              label: Text('$lowCount'),
-              isLabelVisible: lowCount > 0,
-              child: const Icon(Icons.warning_amber_rounded, color: Color(0xFFA86400)),
-            ),
-            label: '残りわずか',
           ),
           NavigationDestination(
             icon: Badge(
