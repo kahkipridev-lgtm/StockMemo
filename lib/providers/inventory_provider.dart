@@ -11,6 +11,8 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
   static const _key = 'inventory_items';
   static const _initializedKey = 'inventory_initialized';
   static const _uuid = Uuid();
+  // 予測に使う購入履歴の保持件数上限（古いものから捨てる）
+  static const _maxHistoryLength = 12;
 
   @override
   Future<List<StockItem>> build() async {
@@ -38,7 +40,7 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
       final items = list
           .map((e) => StockItem.fromJson(e as Map<String, dynamic>))
           .toList();
-      final patched = _applyDefaultYomi(items);
+      final patched = _applyRestockHistorySeed(_applyDefaultYomi(items));
       // 廃止した"残りわずか"(low)を保存していた既存データを在庫切れとして保存し直す（アプリ更新後の既存データ対応）
       if (raw.contains('"stockLevel":"low"')) {
         await _save(patched);
@@ -72,6 +74,33 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     return patched;
   }
 
+  // 履歴がまだない既存アイテムに、最終更新日時を初回の購入記録として補完する（アプリ更新後の既存データ対応）
+  List<StockItem> _applyRestockHistorySeed(List<StockItem> items) {
+    var hasChanges = false;
+    final patched = items.map((item) {
+      if (item.restockHistory.isEmpty &&
+          item.stockLevel == StockLevel.full &&
+          item.statusUpdatedAt != null) {
+        hasChanges = true;
+        return item.copyWith(restockHistory: [item.statusUpdatedAt!]);
+      }
+      return item;
+    }).toList();
+
+    if (hasChanges) {
+      _save(patched);
+    }
+    return patched;
+  }
+
+  List<DateTime> _appendHistory(List<DateTime> history, DateTime timestamp) {
+    final updated = [...history, timestamp];
+    if (updated.length > _maxHistoryLength) {
+      return updated.sublist(updated.length - _maxHistoryLength);
+    }
+    return updated;
+  }
+
   Future<void> _save(List<StockItem> items) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
@@ -85,7 +114,13 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     final now = DateTime.now();
     final updated = items
         .map((item) => item.id == id
-            ? item.copyWith(stockLevel: level, statusUpdatedAt: now)
+            ? item.copyWith(
+                stockLevel: level,
+                statusUpdatedAt: now,
+                restockHistory: level == StockLevel.full
+                    ? _appendHistory(item.restockHistory, now)
+                    : item.restockHistory,
+              )
             : item)
         .toList();
     state = AsyncData(updated);
@@ -94,6 +129,7 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
 
   Future<void> addItem(String name, String genreId, {String? yomi}) async {
     final items = _items;
+    final now = DateTime.now();
     final newItem = StockItem(
       id: _uuid.v4(),
       name: name,
@@ -101,7 +137,8 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
       genreId: genreId,
       stockLevel: StockLevel.full,
       isDefault: false,
-      statusUpdatedAt: DateTime.now(),
+      statusUpdatedAt: now,
+      restockHistory: [now],
     );
     final updated = [...items, newItem];
     state = AsyncData(updated);

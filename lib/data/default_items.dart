@@ -74,6 +74,7 @@ List<StockItem> buildDefaultItems({DateTime? installedAt}) {
         stockLevel: StockLevel.full,
         isDefault: true,
         statusUpdatedAt: installedAt,
+        restockHistory: installedAt != null ? [installedAt] : const [],
       );
     }).toList();
   }
