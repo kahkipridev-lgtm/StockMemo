@@ -1,4 +1,5 @@
 import '../models/genre.dart';
+import '../models/status_change.dart';
 import '../models/stock_item.dart';
 import '../models/stock_level.dart';
 
@@ -74,7 +75,10 @@ List<StockItem> buildDefaultItems({DateTime? installedAt}) {
         stockLevel: StockLevel.full,
         isDefault: true,
         statusUpdatedAt: installedAt,
-        restockHistory: installedAt != null ? [installedAt] : const [],
+        createdAt: installedAt,
+        statusHistory: installedAt != null
+            ? [StatusChange(timestamp: installedAt, level: StockLevel.full)]
+            : const [],
       );
     }).toList();
   }

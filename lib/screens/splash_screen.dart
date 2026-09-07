@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _requestTrackingAndNavigate() async {
     if (Platform.isIOS) {
-      await Future.delayed(const Duration(milliseconds: 200));
+      await Future.delayed(const Duration(milliseconds: 100));
       final status = await AppTrackingTransparency.requestTrackingAuthorization();
       if (status != TrackingStatus.authorized) {
         MobileAds.instance.updateRequestConfiguration(
@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     }
 
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 150));
     if (mounted) {
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
@@ -41,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
               const HomeScreen(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) =>
               FadeTransition(opacity: animation, child: child),
-          transitionDuration: const Duration(milliseconds: 600),
+          transitionDuration: const Duration(milliseconds: 300),
         ),
       );
     }

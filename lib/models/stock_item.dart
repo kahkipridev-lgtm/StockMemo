@@ -1,3 +1,4 @@
+import 'status_change.dart';
 import 'stock_level.dart';
 
 class StockItem {
@@ -8,8 +9,10 @@ class StockItem {
   final StockLevel stockLevel;
   final bool isDefault;
   final DateTime? statusUpdatedAt;
-  // 「買ったばっかり」にした日時の履歴（在庫切れ予測に使う、古い順）
-  final List<DateTime> restockHistory;
+  // アイテムがインベントリに追加された日時（在庫切れ予測などの分析に使う）
+  final DateTime? createdAt;
+  // ステータスが変化するたびの記録（在庫切れ予測などの分析に使う、古い順）
+  final List<StatusChange> statusHistory;
 
   const StockItem({
     required this.id,
@@ -19,7 +22,8 @@ class StockItem {
     this.stockLevel = StockLevel.full,
     this.isDefault = false,
     this.statusUpdatedAt,
-    this.restockHistory = const [],
+    this.createdAt,
+    this.statusHistory = const [],
   });
 
   StockItem copyWith({
@@ -30,7 +34,8 @@ class StockItem {
     StockLevel? stockLevel,
     bool? isDefault,
     DateTime? statusUpdatedAt,
-    List<DateTime>? restockHistory,
+    DateTime? createdAt,
+    List<StatusChange>? statusHistory,
   }) {
     return StockItem(
       id: id ?? this.id,
@@ -40,7 +45,8 @@ class StockItem {
       stockLevel: stockLevel ?? this.stockLevel,
       isDefault: isDefault ?? this.isDefault,
       statusUpdatedAt: statusUpdatedAt ?? this.statusUpdatedAt,
-      restockHistory: restockHistory ?? this.restockHistory,
+      createdAt: createdAt ?? this.createdAt,
+      statusHistory: statusHistory ?? this.statusHistory,
     );
   }
 
@@ -53,13 +59,13 @@ class StockItem {
       'stockLevel': stockLevel.toJson(),
       'isDefault': isDefault,
       'statusUpdatedAt': statusUpdatedAt?.toIso8601String(),
-      'restockHistory':
-          restockHistory.map((d) => d.toIso8601String()).toList(),
+      'createdAt': createdAt?.toIso8601String(),
+      'statusHistory': statusHistory.map((e) => e.toJson()).toList(),
     };
   }
 
   factory StockItem.fromJson(Map<String, dynamic> json) {
-    final rawHistory = json['restockHistory'] as List<dynamic>?;
+    final rawHistory = json['statusHistory'] as List<dynamic>?;
     return StockItem(
       id: json['id'] as String,
       name: json['name'] as String,
@@ -70,11 +76,14 @@ class StockItem {
       statusUpdatedAt: json['statusUpdatedAt'] != null
           ? DateTime.tryParse(json['statusUpdatedAt'] as String)
           : null,
-      restockHistory: rawHistory == null
+      createdAt: json['createdAt'] != null
+          ? DateTime.tryParse(json['createdAt'] as String)
+          : null,
+      statusHistory: rawHistory == null
           ? const []
           : rawHistory
-              .map((e) => DateTime.tryParse(e as String))
-              .whereType<DateTime>()
+              .map((e) => StatusChange.fromJson(e as Map<String, dynamic>))
+              .whereType<StatusChange>()
               .toList(),
     );
   }
