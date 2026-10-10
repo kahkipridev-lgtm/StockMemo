@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../providers/inventory_provider.dart';
@@ -35,11 +36,7 @@ class SettingsScreen extends ConsumerWidget {
             const Divider(),
             _SectionHeader(title: 'アプリについて'),
             const _DeveloperMessagesTile(),
-            const ListTile(
-              leading: Icon(Icons.info_outline_rounded),
-              title: Text('バージョン'),
-              trailing: Text('1.0.0', style: TextStyle(color: Colors.grey)),
-            ),
+            const _VersionTile(),
             const _LinkTile(
               icon: Icons.help_outline_rounded,
               title: 'サポート',
@@ -246,6 +243,25 @@ class _DeveloperMessagesTile extends StatelessWidget {
       trailing: const Icon(Icons.chevron_right_rounded, color: Colors.grey),
       onTap: () {
         Navigator.of(context).pushNamed('/developer_messages');
+      },
+    );
+  }
+}
+
+class _VersionTile extends StatelessWidget {
+  const _VersionTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        final label = snapshot.data?.version ?? '';
+        return ListTile(
+          leading: const Icon(Icons.info_outline_rounded),
+          title: const Text('バージョン'),
+          trailing: Text(label, style: const TextStyle(color: Colors.grey)),
+        );
       },
     );
   }
