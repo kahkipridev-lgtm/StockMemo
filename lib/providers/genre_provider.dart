@@ -54,7 +54,38 @@ final customGenreProvider =
     AsyncNotifierProvider<CustomGenreNotifier, List<Genre>>(
         CustomGenreNotifier.new);
 
+class GenreOrderNotifier extends AsyncNotifier<List<String>> {
+  static const _key = 'genre_order';
+
+  @override
+  Future<List<String>> build() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList(_key) ?? [];
+  }
+
+  Future<void> setOrder(List<String> order) async {
+    state = AsyncData(order);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(_key, order);
+  }
+}
+
+final genreOrderProvider =
+    AsyncNotifierProvider<GenreOrderNotifier, List<String>>(
+        GenreOrderNotifier.new);
+
 final allGenresProvider = Provider<List<Genre>>((ref) {
   final custom = ref.watch(customGenreProvider).value ?? [];
-  return [...Genre.builtIns, ...custom];
+  final all = [...Genre.builtIns, ...custom];
+  final order = ref.watch(genreOrderProvider).value ?? [];
+  if (order.isEmpty) return all;
+
+  final byId = {for (final g in all) g.id: g};
+  final ordered = <Genre>[];
+  for (final id in order) {
+    final g = byId.remove(id);
+    if (g != null) ordered.add(g);
+  }
+  ordered.addAll(byId.values);
+  return ordered;
 });

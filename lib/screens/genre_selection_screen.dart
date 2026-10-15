@@ -19,8 +19,11 @@ class GenreSelectionScreen extends ConsumerStatefulWidget {
 }
 
 class _GenreSelectionScreenState extends ConsumerState<GenreSelectionScreen> {
+  static const _allGenreId = '__all__';
+
   final _searchController = TextEditingController();
   String _searchQuery = '';
+  bool _isReordering = false;
 
   @override
   void dispose() {
@@ -32,6 +35,8 @@ class _GenreSelectionScreenState extends ConsumerState<GenreSelectionScreen> {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final allGenres = ref.watch(allGenresProvider);
+    final order = ref.watch(genreOrderProvider).value ?? [];
+    final displayGenres = _withAllGenre(allGenres, primaryColor, order);
     final itemsAsync = ref.watch(inventoryProvider);
 
     return Scaffold(
@@ -40,14 +45,20 @@ class _GenreSelectionScreenState extends ConsumerState<GenreSelectionScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add_rounded),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => const AddGenreDialog(),
-              );
-            },
+            icon: Icon(_isReordering ? Icons.check_rounded : Icons.sort_rounded),
+            tooltip: _isReordering ? '完了' : '並び替え',
+            onPressed: () => setState(() => _isReordering = !_isReordering),
           ),
+          if (!_isReordering)
+            IconButton(
+              icon: const Icon(Icons.add_rounded),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (_) => const AddGenreDialog(),
+                );
+              },
+            ),
         ],
       ),
       body: Column(
@@ -80,9 +91,23 @@ class _GenreSelectionScreenState extends ConsumerState<GenreSelectionScreen> {
               onChanged: (value) => setState(() => _searchQuery = value),
             ),
           ),
+          if (_isReordering)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+              child: Text(
+                'カードをドラッグすると並び順を変更できます',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
+                ),
+              ),
+            ),
           Expanded(
             child: _searchQuery.isEmpty
-                ? _buildGenreGrid(context, primaryColor, allGenres)
+                ? _buildGenreGrid(context, displayGenres)
                 : _buildSearchResults(context, itemsAsync),
           ),
         ],
@@ -90,8 +115,31 @@ class _GenreSelectionScreenState extends ConsumerState<GenreSelectionScreen> {
     );
   }
 
-  Widget _buildGenreGrid(
-      BuildContext context, Color primaryColor, List<Genre> allGenres) {
+  List<Genre> _withAllGenre(
+      List<Genre> genres, Color primaryColor, List<String> order) {
+    final allGenre = Genre(
+      id: _allGenreId,
+      label: '全て表示',
+      icon: Icons.apps_rounded,
+      color: primaryColor,
+    );
+    final combined = [allGenre, ...genres];
+    if (order.isEmpty) return combined;
+
+    final byId = {for (final g in combined) g.id: g};
+    final ordered = <Genre>[];
+    for (final id in order) {
+      final g = byId.remove(id);
+      if (g != null) ordered.add(g);
+    }
+    // 並び順未設定（移動したことがない）の場合、全て表示は左上をデフォルト位置とする
+    final leftoverAll = byId.remove(_allGenreId);
+    if (leftoverAll != null) ordered.insert(0, leftoverAll);
+    ordered.addAll(byId.values);
+    return ordered;
+  }
+
+  Widget _buildGenreGrid(BuildContext context, List<Genre> genres) {
     return LayoutBuilder(
       builder: (context, constraints) {
         const edge = 12.0;
@@ -99,94 +147,111 @@ class _GenreSelectionScreenState extends ConsumerState<GenreSelectionScreen> {
         final itemWidth = (constraints.maxWidth - edge * 2 - gap) / 2;
         final itemHeight = itemWidth / 1.1;
 
-        return CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
-              sliver: SliverToBoxAdapter(
-                child: SizedBox(
-                  height: itemHeight,
-                  child: Card(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          '/inventory',
-                          arguments: const InventoryFilter(),
-                        );
-                      },
-                      borderRadius: BorderRadius.circular(16),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: primaryColor.withValues(alpha: 0.15),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.apps_rounded,
-                                size: 32, color: primaryColor),
-                          ),
-                          const SizedBox(height: 12),
-                          const Text(
-                            '全て表示',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.all(12),
-              sliver: SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.1,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final genre = allGenres[index];
-                    final isBuiltIn =
-                        Genre.builtIns.any((b) => b.id == genre.id);
-                    return GenreCard(
-                      genre: genre,
-                      onTap: () {
-                        Navigator.of(context).pushNamed(
-                          '/inventory',
-                          arguments: InventoryFilter(genre: genre),
-                        );
-                      },
-                      onLongPress: isBuiltIn
-                          ? null
-                          : () {
-                              showDialog(
-                                context: context,
-                                builder: (_) =>
-                                    AddGenreDialog(initialGenre: genre),
-                              );
-                            },
-                    );
-                  },
-                  childCount: allGenres.length,
-                ),
-              ),
-            ),
-          ],
+        return GridView.builder(
+          padding: const EdgeInsets.all(12),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.1,
+          ),
+          itemCount: genres.length,
+          itemBuilder: (context, index) {
+            final genre = genres[index];
+
+            if (_isReordering) {
+              return _buildReorderableCard(
+                  context, genres, index, itemWidth, itemHeight);
+            }
+
+            final isAll = genre.id == _allGenreId;
+            return GenreCard(
+              genre: genre,
+              onTap: () {
+                Navigator.of(context).pushNamed(
+                  '/inventory',
+                  arguments: isAll
+                      ? const InventoryFilter()
+                      : InventoryFilter(genre: genre),
+                );
+              },
+              onLongPress: () => setState(() => _isReordering = true),
+            );
+          },
         );
       },
     );
+  }
+
+  Widget _buildReorderableCard(BuildContext context, List<Genre> genres,
+      int index, double width, double height) {
+    final genre = genres[index];
+    final isCustom = genre.id != _allGenreId &&
+        !Genre.builtIns.any((b) => b.id == genre.id);
+
+    return DragTarget<int>(
+      onWillAcceptWithDetails: (details) => details.data != index,
+      onAcceptWithDetails: (details) => _reorder(genres, details.data, index),
+      builder: (context, candidateData, rejectedData) {
+        final isTarget = candidateData.isNotEmpty;
+        return AnimatedScale(
+          scale: isTarget ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 150),
+          child: Draggable<int>(
+            data: index,
+            feedback: SizedBox(
+              width: width,
+              height: height,
+              child: Opacity(
+                opacity: 0.85,
+                child: GenreCard(genre: genre, onTap: () {}),
+              ),
+            ),
+            childWhenDragging: Opacity(
+              opacity: 0.3,
+              child: GenreCard(genre: genre, onTap: () {}),
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                GenreCard(genre: genre, onTap: () {}),
+                if (isCustom)
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Material(
+                      color: Theme.of(context).colorScheme.surface,
+                      shape: const CircleBorder(),
+                      elevation: 2,
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AddGenreDialog(initialGenre: genre),
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(6),
+                          child: Icon(Icons.edit_rounded, size: 16),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _reorder(List<Genre> genres, int fromIndex, int toIndex) {
+    if (fromIndex == toIndex) return;
+    final ids = genres.map((g) => g.id).toList();
+    final id = ids.removeAt(fromIndex);
+    ids.insert(toIndex, id);
+    ref.read(genreOrderProvider.notifier).setOrder(ids);
   }
 
   // カタカナをひらがなに変換して検索文字列を正規化する
