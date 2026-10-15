@@ -189,7 +189,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                     controller: _addController,
                     focusNode: _addFocusNode,
                     textInputAction: TextInputAction.done,
-                    onSubmitted: (_) => _submitAdd(refocus: true),
+                    onEditingComplete: () => _submitAdd(refocus: true),
                     decoration: const InputDecoration(
                       hintText: 'アイテムを追加...',
                       border: InputBorder.none,
