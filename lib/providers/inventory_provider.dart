@@ -135,6 +135,21 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     await _save(updated);
   }
 
+  Future<void> updateMemo(String id, String? memo) async {
+    final items = _items;
+    final trimmed = memo?.trim();
+    final updated = items
+        .map((item) => item.id == id
+            ? item.copyWith(
+                memo: (trimmed == null || trimmed.isEmpty) ? null : trimmed,
+                clearMemo: trimmed == null || trimmed.isEmpty,
+              )
+            : item)
+        .toList();
+    state = AsyncData(updated);
+    await _save(updated);
+  }
+
   Future<void> addItem(String name, String genreId, {String? yomi}) async {
     final items = _items;
     final now = DateTime.now();

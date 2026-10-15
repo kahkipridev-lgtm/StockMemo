@@ -8,6 +8,7 @@ class StockItem {
   final String genreId;
   final StockLevel stockLevel;
   final bool isDefault;
+  final String? memo;
   final DateTime? statusUpdatedAt;
   // アイテムがインベントリに追加された日時（在庫切れ予測などの分析に使う）
   final DateTime? createdAt;
@@ -21,6 +22,7 @@ class StockItem {
     required this.genreId,
     this.stockLevel = StockLevel.full,
     this.isDefault = false,
+    this.memo,
     this.statusUpdatedAt,
     this.createdAt,
     this.statusHistory = const [],
@@ -33,6 +35,8 @@ class StockItem {
     String? genreId,
     StockLevel? stockLevel,
     bool? isDefault,
+    String? memo,
+    bool clearMemo = false,
     DateTime? statusUpdatedAt,
     DateTime? createdAt,
     List<StatusChange>? statusHistory,
@@ -44,6 +48,7 @@ class StockItem {
       genreId: genreId ?? this.genreId,
       stockLevel: stockLevel ?? this.stockLevel,
       isDefault: isDefault ?? this.isDefault,
+      memo: clearMemo ? null : (memo ?? this.memo),
       statusUpdatedAt: statusUpdatedAt ?? this.statusUpdatedAt,
       createdAt: createdAt ?? this.createdAt,
       statusHistory: statusHistory ?? this.statusHistory,
@@ -58,6 +63,7 @@ class StockItem {
       'genre': genreId,
       'stockLevel': stockLevel.toJson(),
       'isDefault': isDefault,
+      if (memo != null) 'memo': memo,
       'statusUpdatedAt': statusUpdatedAt?.toIso8601String(),
       'createdAt': createdAt?.toIso8601String(),
       'statusHistory': statusHistory.map((e) => e.toJson()).toList(),
@@ -73,6 +79,7 @@ class StockItem {
       genreId: json['genre'] as String,
       stockLevel: StockLevel.fromJson(json['stockLevel'] as String),
       isDefault: json['isDefault'] as bool? ?? false,
+      memo: json['memo'] as String?,
       statusUpdatedAt: json['statusUpdatedAt'] != null
           ? DateTime.tryParse(json['statusUpdatedAt'] as String)
           : null,
