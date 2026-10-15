@@ -54,11 +54,10 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
         title: Text(filter.title),
         centerTitle: true,
         actions: [
-          if (filter.genre != null)
-            IconButton(
-              icon: const Icon(Icons.add_rounded),
-              onPressed: () => _showAddDialog(context, filter.genre),
-            ),
+          IconButton(
+            icon: const Icon(Icons.add_rounded),
+            onPressed: () => _showAddDialog(context, filter.genre),
+          ),
         ],
       ),
       body: itemsAsync.when(
@@ -112,11 +111,6 @@ class _InventoryScreenState extends ConsumerState<InventoryScreen> {
             ],
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: null,
-        onPressed: () => _showAddDialog(context, filter.genre),
-        child: const Icon(Icons.add_rounded),
       ),
     );
   }
