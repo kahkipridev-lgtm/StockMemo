@@ -1,2 +1,7 @@
 #include? "Pods/Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"
 #include "Generated.xcconfig"
+
+// アプリはカスタムジャンルの選択アイコンをJSONのcodePointから動的に
+// IconData化するため、Flutterのアイコンtree-shakingだと必要なアイコンが
+// 消えてビルド失敗する（lib/models/genre.dart参照）。無効化する。
+TREE_SHAKE_ICONS = false
