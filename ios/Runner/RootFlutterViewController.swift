@@ -17,6 +17,7 @@ final class RootFlutterViewController: FlutterViewController {
     TabSpec(title: "在庫を確認", icon: "shippingbox", selectedIcon: "shippingbox.fill"),
     TabSpec(title: "在庫切れ", icon: "xmark.bin", selectedIcon: "xmark.bin.fill"),
     TabSpec(title: "買い物リスト", icon: "cart", selectedIcon: "cart.fill"),
+    TabSpec(title: "ツール", icon: "wrench.and.screwdriver", selectedIcon: "wrench.and.screwdriver.fill"),
     TabSpec(title: "設定", icon: "gearshape", selectedIcon: "gearshape.fill"),
   ]
 
@@ -77,8 +78,8 @@ final class RootFlutterViewController: FlutterViewController {
     if items.count > 1 {
       items[1].badgeValue = badgeText(forCount: data["empty"])
     }
-    if items.count > 3 {
-      items[3].badgeValue = (data["hasUnread"] as? Bool == true) ? "!" : nil
+    if items.count > 4 {
+      items[4].badgeValue = (data["hasUnread"] as? Bool == true) ? "!" : nil
     }
   }
 }

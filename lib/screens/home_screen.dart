@@ -14,6 +14,7 @@ import 'genre_selection_screen.dart';
 import 'inventory_screen.dart';
 import 'settings_screen.dart';
 import 'shopping_list_screen.dart';
+import 'tools_screen.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +36,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     Color(0xFF7A5100),
     Color(0xFFC0392B),
     Color(0xFF2E7D32),
+    Color(0xFF1565C0),
   ];
 
   @override
@@ -97,6 +99,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   isActive: _currentIndex == 1,
                 ),
                 const ShoppingListScreen(),
+                const ToolsScreen(),
                 const SettingsScreen(),
               ],
             ),
@@ -134,6 +137,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             selectedIcon:
                 Icon(Icons.shopping_cart_rounded, color: Color(0xFF2E7D32)),
             label: '買い物リスト',
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.handyman_outlined, color: Color(0xFF1565C0)),
+            selectedIcon: Icon(Icons.handyman_rounded, color: Color(0xFF1565C0)),
+            label: 'ツール',
           ),
           NavigationDestination(
             icon: Badge(
