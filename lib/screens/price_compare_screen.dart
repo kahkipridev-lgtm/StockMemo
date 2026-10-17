@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -53,6 +55,16 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
     final unitA = (priceA != null && amountA != null) ? priceA / amountA : null;
     final unitB = (priceB != null && amountB != null) ? priceB / amountB : null;
 
+    // 正なら商品Aが安い（左が上がる）、負なら商品Bが安い（右が上がる）
+    var tilt = 0.0;
+    if (unitA != null && unitB != null && unitA != unitB) {
+      final cheap = unitA < unitB ? unitA : unitB;
+      final expensive = unitA < unitB ? unitB : unitA;
+      final ratio = (expensive - cheap) / expensive;
+      final angle = (0.1 + ratio * 0.4).clamp(0.0, 0.3);
+      tilt = unitA < unitB ? angle : -angle;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('容量・価格を比較'),
@@ -69,35 +81,28 @@ class _PriceCompareScreenState extends State<PriceCompareScreen> {
         behavior: HitTestBehavior.translucent,
         onTap: () => FocusScope.of(context).unfocus(),
         child: ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _ProductCard(
-                    label: '商品A',
-                    price: _priceA,
-                    amount: _amountA,
-                    unitPrice: unitA,
-                    isCheaper: unitA != null && unitB != null && unitA < unitB,
-                    fmt: _fmt,
-                    onChanged: () => setState(() {}),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ProductCard(
-                    label: '商品B',
-                    price: _priceB,
-                    amount: _amountB,
-                    unitPrice: unitB,
-                    isCheaper: unitA != null && unitB != null && unitB < unitA,
-                    fmt: _fmt,
-                    onChanged: () => setState(() {}),
-                  ),
-                ),
-              ],
+            _BalanceLayout(
+              tilt: tilt,
+              left: _ProductCard(
+                label: '商品A',
+                price: _priceA,
+                amount: _amountA,
+                unitPrice: unitA,
+                isCheaper: unitA != null && unitB != null && unitA < unitB,
+                fmt: _fmt,
+                onChanged: () => setState(() {}),
+              ),
+              right: _ProductCard(
+                label: '商品B',
+                price: _priceB,
+                amount: _amountB,
+                unitPrice: unitB,
+                isCheaper: unitA != null && unitB != null && unitB < unitA,
+                fmt: _fmt,
+                onChanged: () => setState(() {}),
+              ),
             ),
           ],
         ),
@@ -196,4 +201,133 @@ class _ProductCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// 天秤のように2枚のカードを吊るすレイアウト。tiltが正なら左が上がる。
+class _BalanceLayout extends StatelessWidget {
+  final double tilt;
+  final Widget left;
+  final Widget right;
+
+  const _BalanceLayout({
+    required this.tilt,
+    required this.left,
+    required this.right,
+  });
+
+  static const _gap = 12.0;
+  static const _topHeight = 110.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final cardWidth = (width - _gap) / 2;
+        // 支点から各カード中心までの水平距離
+        final arm = width / 2 - cardWidth / 2;
+
+        return TweenAnimationBuilder<double>(
+          tween: Tween(end: tilt),
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutBack,
+          builder: (context, t, _) {
+            final lift = arm * math.sin(t);
+            final base = arm * math.sin(t).abs();
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _BalancePainter(
+                      tilt: t,
+                      arm: arm,
+                      pivotY: 40,
+                      stringLength: _topHeight - 40 + base,
+                      color: color,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: _topHeight),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Transform.translate(
+                          offset: Offset(0, base - lift),
+                          child: left,
+                        ),
+                      ),
+                      const SizedBox(width: _gap),
+                      Expanded(
+                        child: Transform.translate(
+                          offset: Offset(0, base + lift),
+                          child: right,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _BalancePainter extends CustomPainter {
+  final double tilt;
+  final double arm;
+  final double pivotY;
+  final double stringLength;
+  final Color color;
+
+  _BalancePainter({
+    required this.tilt,
+    required this.arm,
+    required this.pivotY,
+    required this.stringLength,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final dy = arm * math.sin(tilt);
+    final dx = arm * math.cos(tilt);
+    final leftEnd = Offset(cx - dx, pivotY - dy);
+    final rightEnd = Offset(cx + dx, pivotY + dy);
+
+    final line = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+    final beam = Paint()
+      ..color = color
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round;
+
+    // 支柱と支点
+    canvas.drawLine(Offset(cx, pivotY), Offset(cx, 4), line);
+    canvas.drawCircle(Offset(cx, 4), 4, Paint()..color = color);
+
+    // ひも（左右同じ長さで下のカードを吊る）
+    canvas.drawLine(leftEnd, leftEnd + Offset(0, stringLength), line);
+    canvas.drawLine(rightEnd, rightEnd + Offset(0, stringLength), line);
+
+    // 横棒と支点の丸
+    canvas.drawLine(leftEnd, rightEnd, beam);
+    canvas.drawCircle(leftEnd, 4, Paint()..color = color);
+    canvas.drawCircle(rightEnd, 4, Paint()..color = color);
+    canvas.drawCircle(Offset(cx, pivotY), 7, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(_BalancePainter old) =>
+      old.tilt != tilt || old.arm != arm || old.color != color;
 }
