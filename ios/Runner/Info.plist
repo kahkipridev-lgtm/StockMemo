@@ -66,6 +66,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>値札を撮影して商品名や価格を読み取るために使用します。</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>値札の写真を選択して商品名や価格を読み取るために使用します。</string>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-8387488850667441~3819463727</string>
 	<key>NSUserTrackingUsageDescription</key>

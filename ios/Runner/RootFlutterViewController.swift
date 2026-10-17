@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import Vision
 
 /// Flutterのコンテンツの上に、iOSネイティブの UITabBar を重ねて表示するルートVC。
 /// iOS 26 SDKでビルドすると、標準の UITabBar は自動でLiquid Glass素材になる。
@@ -23,11 +24,13 @@ final class RootFlutterViewController: FlutterViewController {
 
   private let tabBar = UITabBar()
   private var methodChannel: FlutterMethodChannel?
+  private var ocrChannel: FlutterMethodChannel?
 
   override func viewDidLoad() {
     super.viewDidLoad()
     setUpTabBar()
     setUpMethodChannel()
+    setUpOcrChannel()
   }
 
   private func setUpTabBar() {
@@ -67,6 +70,45 @@ final class RootFlutterViewController: FlutterViewController {
     methodChannel = channel
   }
 
+  /// 値札OCR: Vision フレームワークで画像内の文字行を認識して返す。
+  private func setUpOcrChannel() {
+    let channel = FlutterMethodChannel(name: "com.stockmemo.app/ocr", binaryMessenger: binaryMessenger)
+    channel.setMethodCallHandler { call, result in
+      guard call.method == "recognizeText", let path = call.arguments as? String else {
+        result(FlutterMethodNotImplemented)
+        return
+      }
+      DispatchQueue.global(qos: .userInitiated).async {
+        guard let image = UIImage(contentsOfFile: path), let cgImage = image.cgImage else {
+          DispatchQueue.main.async { result(FlutterError(code: "bad_image", message: nil, details: nil)) }
+          return
+        }
+        let request = VNRecognizeTextRequest()
+        request.recognitionLevel = .accurate
+        request.usesLanguageCorrection = true
+        if #available(iOS 16.0, *) {
+          request.revision = VNRecognizeTextRequestRevision3
+          request.recognitionLanguages = ["ja-JP", "en-US"]
+        }
+        let handler = VNImageRequestHandler(
+          cgImage: cgImage,
+          orientation: CGImagePropertyOrientation(image.imageOrientation),
+          options: [:]
+        )
+        do {
+          try handler.perform([request])
+          let lines = (request.results ?? []).compactMap { $0.topCandidates(1).first?.string }
+          DispatchQueue.main.async { result(lines) }
+        } catch {
+          DispatchQueue.main.async {
+            result(FlutterError(code: "ocr_failed", message: error.localizedDescription, details: nil))
+          }
+        }
+      }
+    }
+    ocrChannel = channel
+  }
+
   private func updateBadges(with data: [String: Any]) {
     guard let items = tabBar.items else { return }
 
@@ -88,5 +130,21 @@ extension RootFlutterViewController: UITabBarDelegate {
   func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
     let index = tabBar.items?.firstIndex(of: item) ?? 0
     methodChannel?.invokeMethod("tabSelected", arguments: ["index": index])
+  }
+}
+
+private extension CGImagePropertyOrientation {
+  init(_ o: UIImage.Orientation) {
+    switch o {
+    case .up: self = .up
+    case .upMirrored: self = .upMirrored
+    case .down: self = .down
+    case .downMirrored: self = .downMirrored
+    case .left: self = .left
+    case .leftMirrored: self = .leftMirrored
+    case .right: self = .right
+    case .rightMirrored: self = .rightMirrored
+    @unknown default: self = .up
+    }
   }
 }

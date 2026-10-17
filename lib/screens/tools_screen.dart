@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'price_compare_screen.dart';
+import 'price_tag_search_screen.dart';
 
 class ToolsScreen extends StatelessWidget {
   const ToolsScreen({super.key});
@@ -26,6 +27,21 @@ class ToolsScreen extends StatelessWidget {
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const PriceCompareScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              leading: Icon(Icons.document_scanner_rounded,
+                  color: colorScheme.primary),
+              title: const Text('値札で最安検索'),
+              subtitle: const Text('値札を撮影して、Amazonで安い商品を探します'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (_) => const PriceTagSearchScreen()),
               ),
             ),
           ),
