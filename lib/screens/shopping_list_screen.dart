@@ -13,6 +13,7 @@ class ShoppingListScreen extends ConsumerStatefulWidget {
 class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   final _addController = TextEditingController();
   final _addFocusNode = FocusNode();
+  final _scrollController = ScrollController();
 
   final _editController = TextEditingController();
   final _editFocusNode = FocusNode();
@@ -22,7 +23,11 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   void initState() {
     super.initState();
     _addFocusNode.addListener(() {
-      if (!_addFocusNode.hasFocus) _submitAdd();
+      if (_addFocusNode.hasFocus) {
+        _scrollAddRowIntoView();
+      } else {
+        _submitAdd();
+      }
     });
     _editFocusNode.addListener(() {
       if (!_editFocusNode.hasFocus) _commitEdit();
@@ -33,9 +38,21 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   void dispose() {
     _addController.dispose();
     _addFocusNode.dispose();
+    _scrollController.dispose();
     _editController.dispose();
     _editFocusNode.dispose();
     super.dispose();
+  }
+
+  void _scrollAddRowIntoView() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
+      );
+    });
   }
 
   void _submitAdd({bool refocus = false}) {
@@ -44,6 +61,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
     ref.read(shoppingListProvider.notifier).addItem(name);
     _addController.clear();
     if (refocus) _addFocusNode.requestFocus();
+    _scrollAddRowIntoView();
   }
 
   void _startEdit(String id, String currentName) {
@@ -97,6 +115,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             ],
           ),
           body: CustomScrollView(
+            controller: _scrollController,
             slivers: [
               // 既存アイテム一覧
               SliverList(
