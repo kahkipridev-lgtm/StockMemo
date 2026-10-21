@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/stock_level.dart';
+import '../providers/inventory_provider.dart';
 import '../providers/shopping_list_provider.dart';
+import '../widgets/item_card.dart';
 
 class ShoppingListScreen extends ConsumerStatefulWidget {
   const ShoppingListScreen({super.key});
@@ -88,6 +91,10 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncItems = ref.watch(shoppingListProvider);
+    final emptyStockItems = (ref.watch(inventoryProvider).value ?? [])
+        .where((item) => item.stockLevel == StockLevel.empty)
+        .toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
 
     return asyncItems.when(
       loading: () => const Scaffold(
@@ -117,6 +124,40 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           body: CustomScrollView(
             controller: _scrollController,
             slivers: [
+              // 在庫切れアイテム
+              if (emptyStockItems.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: _SectionHeader(
+                    icon: Icons.remove_circle_outline_rounded,
+                    label: '在庫切れ',
+                    color: const Color(0xFFC0392B),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final item = emptyStockItems[index];
+                      return ItemCard(
+                        key: Key(item.id),
+                        item: item,
+                        onDelete: () => ref
+                            .read(inventoryProvider.notifier)
+                            .deleteItem(item.id),
+                      );
+                    },
+                    childCount: emptyStockItems.length,
+                  ),
+                ),
+                const SliverToBoxAdapter(child: Divider(height: 24)),
+                SliverToBoxAdapter(
+                  child: _SectionHeader(
+                    icon: Icons.shopping_cart_outlined,
+                    label: '買い物メモ',
+                    color: const Color(0xFF2E7D32),
+                  ),
+                ),
+              ],
+
               // 既存アイテム一覧
               SliverList(
                 delegate: SliverChildBuilderDelegate(
@@ -239,6 +280,39 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _SectionHeader({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: color,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

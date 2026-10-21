@@ -5,13 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/inventory_filter.dart';
 import '../models/stock_level.dart';
 import '../providers/developer_messages_provider.dart';
 import '../providers/inventory_provider.dart';
 import '../widgets/banner_ad_widget.dart';
 import 'genre_selection_screen.dart';
-import 'inventory_screen.dart';
 import 'settings_screen.dart';
 import 'shopping_list_screen.dart';
 import 'tools_screen.dart';
@@ -34,7 +32,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   static const _tabColors = [
     Color(0xFF7A5100),
-    Color(0xFFC0392B),
     Color(0xFF2E7D32),
     Color(0xFF1565C0),
   ];
@@ -93,11 +90,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               index: _currentIndex,
               children: [
                 const GenreSelectionScreen(),
-                InventoryScreen(
-                  key: const ValueKey('empty'),
-                  filter: const InventoryFilter(levels: [StockLevel.empty]),
-                  isActive: _currentIndex == 1,
-                ),
                 const ShoppingListScreen(),
                 const ToolsScreen(),
                 const SettingsScreen(),
@@ -123,19 +115,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: Badge(
               label: Text('$emptyCount'),
               isLabelVisible: emptyCount > 0,
-              child: const Icon(Icons.remove_circle_outline_rounded, color: Color(0xFFC0392B)),
+              child: const Icon(Icons.shopping_cart_outlined, color: Color(0xFF2E7D32)),
             ),
             selectedIcon: Badge(
               label: Text('$emptyCount'),
               isLabelVisible: emptyCount > 0,
-              child: const Icon(Icons.remove_circle_rounded, color: Color(0xFFC0392B)),
+              child: const Icon(Icons.shopping_cart_rounded, color: Color(0xFF2E7D32)),
             ),
-            label: '在庫切れ',
-          ),
-          const NavigationDestination(
-            icon: Icon(Icons.shopping_cart_outlined, color: Color(0xFF2E7D32)),
-            selectedIcon:
-                Icon(Icons.shopping_cart_rounded, color: Color(0xFF2E7D32)),
             label: '買い物リスト',
           ),
           const NavigationDestination(
