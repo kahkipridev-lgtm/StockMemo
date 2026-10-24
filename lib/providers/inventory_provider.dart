@@ -128,8 +128,23 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
                   item.statusHistory,
                   StatusChange(timestamp: now, level: level),
                 ),
+                // 在庫切れ→在庫ありに戻した直後は、買い物リストの在庫切れ欄に
+                // 取消線付きで一時的に残す（右上の削除ボタンで消えるまで）
+                justRestocked: level == StockLevel.full &&
+                    item.stockLevel == StockLevel.empty,
               )
             : item)
+        .toList();
+    state = AsyncData(updated);
+    await _save(updated);
+  }
+
+  // 在庫ありに戻した直後のアイテム（justRestocked）を買い物リストの在庫切れ欄からまとめて消す
+  Future<void> clearRestocked() async {
+    final items = _items;
+    final updated = items
+        .map((item) =>
+            item.justRestocked ? item.copyWith(justRestocked: false) : item)
         .toList();
     state = AsyncData(updated);
     await _save(updated);

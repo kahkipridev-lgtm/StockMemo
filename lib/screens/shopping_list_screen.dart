@@ -92,9 +92,16 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   Widget build(BuildContext context) {
     final asyncItems = ref.watch(shoppingListProvider);
     final emptyStockItems = (ref.watch(inventoryProvider).value ?? [])
-        .where((item) => item.stockLevel == StockLevel.empty)
+        .where((item) =>
+            item.stockLevel == StockLevel.empty || item.justRestocked)
         .toList()
-      ..sort((a, b) => a.name.compareTo(b.name));
+      ..sort((a, b) {
+        if (a.justRestocked != b.justRestocked) {
+          return a.justRestocked ? 1 : -1;
+        }
+        return a.name.compareTo(b.name);
+      });
+    final hasRestocked = emptyStockItems.any((item) => item.justRestocked);
 
     return asyncItems.when(
       loading: () => const Scaffold(
@@ -111,12 +118,19 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
             title: const Text('買い物リスト'),
             actions: [
               IconButton(
-                icon: const Icon(Icons.playlist_remove_rounded),
-                tooltip: '購入済みを削除',
-                onPressed: hasPurchased
-                    ? () => ref
-                        .read(shoppingListProvider.notifier)
-                        .clearPurchased()
+                icon: const Icon(Icons.delete_sweep_rounded),
+                tooltip: '完了した項目をまとめて削除',
+                onPressed: (hasRestocked || hasPurchased)
+                    ? () {
+                        if (hasRestocked) {
+                          ref.read(inventoryProvider.notifier).clearRestocked();
+                        }
+                        if (hasPurchased) {
+                          ref
+                              .read(shoppingListProvider.notifier)
+                              .clearPurchased();
+                        }
+                      }
                     : null,
               ),
             ],
@@ -140,6 +154,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                       return ItemCard(
                         key: Key(item.id),
                         item: item,
+                        strikeThrough: item.justRestocked,
                         onDelete: () => ref
                             .read(inventoryProvider.notifier)
                             .deleteItem(item.id),

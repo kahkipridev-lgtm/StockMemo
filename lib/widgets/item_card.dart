@@ -7,8 +7,15 @@ import '../providers/inventory_provider.dart';
 class ItemCard extends ConsumerWidget {
   final StockItem item;
   final VoidCallback onDelete;
+  // 在庫ありに戻った直後のアイテムを取消線付きで表示するかどうか（買い物リストの在庫切れ欄のみ）
+  final bool strikeThrough;
 
-  const ItemCard({super.key, required this.item, required this.onDelete});
+  const ItemCard({
+    super.key,
+    required this.item,
+    required this.onDelete,
+    this.strikeThrough = false,
+  });
 
   String? _updatedAtLabel(DateTime? updatedAt) {
     if (updatedAt == null) return null;
@@ -61,8 +68,18 @@ class ItemCard extends ConsumerWidget {
             children: [
               Text(
                 item.name,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                  decoration:
+                      strikeThrough ? TextDecoration.lineThrough : null,
+                  color: strikeThrough
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.4)
+                      : null,
+                ),
               ),
               if (item.memo != null && item.memo!.isNotEmpty)
                 Text(

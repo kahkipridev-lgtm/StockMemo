@@ -14,6 +14,8 @@ class StockItem {
   final DateTime? createdAt;
   // ステータスが変化するたびの記録（在庫切れ予測などの分析に使う、古い順）
   final List<StatusChange> statusHistory;
+  // 在庫切れから在庫ありに戻した直後かどうか（買い物リストの在庫切れ欄に取消線付きで残す用）
+  final bool justRestocked;
 
   const StockItem({
     required this.id,
@@ -26,6 +28,7 @@ class StockItem {
     this.statusUpdatedAt,
     this.createdAt,
     this.statusHistory = const [],
+    this.justRestocked = false,
   });
 
   StockItem copyWith({
@@ -40,6 +43,7 @@ class StockItem {
     DateTime? statusUpdatedAt,
     DateTime? createdAt,
     List<StatusChange>? statusHistory,
+    bool? justRestocked,
   }) {
     return StockItem(
       id: id ?? this.id,
@@ -52,6 +56,7 @@ class StockItem {
       statusUpdatedAt: statusUpdatedAt ?? this.statusUpdatedAt,
       createdAt: createdAt ?? this.createdAt,
       statusHistory: statusHistory ?? this.statusHistory,
+      justRestocked: justRestocked ?? this.justRestocked,
     );
   }
 
@@ -67,6 +72,7 @@ class StockItem {
       'statusUpdatedAt': statusUpdatedAt?.toIso8601String(),
       'createdAt': createdAt?.toIso8601String(),
       'statusHistory': statusHistory.map((e) => e.toJson()).toList(),
+      'justRestocked': justRestocked,
     };
   }
 
@@ -92,6 +98,7 @@ class StockItem {
               .map((e) => StatusChange.fromJson(e as Map<String, dynamic>))
               .whereType<StatusChange>()
               .toList(),
+      justRestocked: json['justRestocked'] as bool? ?? false,
     );
   }
 }
