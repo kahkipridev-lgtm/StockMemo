@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'achievements_screen.dart';
 import 'price_compare_screen.dart';
 import 'price_tag_search_screen.dart';
 import 'stats_screen.dart';
@@ -56,6 +57,19 @@ class ToolsScreen extends StatelessWidget {
               trailing: const Icon(Icons.chevron_right_rounded),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const StatsScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              leading: Icon(Icons.emoji_events_rounded, color: colorScheme.primary),
+              title: const Text('実績'),
+              subtitle: const Text('？？？を解除しよう'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AchievementsScreen()),
               ),
             ),
           ),

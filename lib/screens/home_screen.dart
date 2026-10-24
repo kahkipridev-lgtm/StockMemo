@@ -5,9 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/achievement.dart';
 import '../models/stock_level.dart';
+import '../providers/achievement_unlock_provider.dart';
+import '../providers/achievements_provider.dart';
 import '../providers/developer_messages_provider.dart';
 import '../providers/inventory_provider.dart';
+import '../widgets/achievement_badge_toast.dart';
 import '../widgets/banner_ad_widget.dart';
 import 'genre_selection_screen.dart';
 import 'settings_screen.dart';
@@ -63,6 +67,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<List<AchievementCategory>>(achievementCategoriesProvider,
+        (previous, next) {
+      final achievements = next.expand((c) => c.achievements).toList();
+      ref
+          .read(achievementUnlockProvider.notifier)
+          .checkForNewUnlocks(achievements)
+          .then((newlyUnlocked) {
+        if (!mounted) return;
+        for (final achievement in newlyUnlocked) {
+          // ignore: use_build_context_synchronously
+          showAchievementBadge(context, achievement);
+        }
+      });
+    });
+
     final colorScheme = Theme.of(context).colorScheme;
     final indicatorColor = _currentIndex < _tabColors.length
         ? _tabColors[_currentIndex]
