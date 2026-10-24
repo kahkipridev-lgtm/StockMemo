@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import '../models/shopping_item.dart';
+import 'purchase_log_provider.dart';
 
 class ShoppingListNotifier extends AsyncNotifier<List<ShoppingItem>> {
   static const _key = 'shopping_list_items';
@@ -56,13 +57,18 @@ class ShoppingListNotifier extends AsyncNotifier<List<ShoppingItem>> {
   }
 
   Future<void> togglePurchased(String id) async {
+    final target = _items.firstWhere((item) => item.id == id);
+    final willBePurchased = !target.isPurchased;
     final updated = _items
         .map((item) => item.id == id
-            ? item.copyWith(isPurchased: !item.isPurchased)
+            ? item.copyWith(isPurchased: willBePurchased)
             : item)
         .toList();
     state = AsyncData(updated);
     await _save(updated);
+    if (willBePurchased) {
+      await ref.read(purchaseLogProvider.notifier).logPurchase(target.name);
+    }
   }
 
   Future<void> deleteItem(String id) async {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'price_compare_screen.dart';
 import 'price_tag_search_screen.dart';
+import 'stats_screen.dart';
 
 class ToolsScreen extends StatelessWidget {
   const ToolsScreen({super.key});
@@ -42,6 +43,19 @@ class ToolsScreen extends StatelessWidget {
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
                     builder: (_) => const PriceTagSearchScreen()),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            clipBehavior: Clip.antiAlias,
+            child: ListTile(
+              leading: Icon(Icons.insights_rounded, color: colorScheme.primary),
+              title: const Text('統計'),
+              subtitle: const Text('利用日数や購入・在庫切れの推移を確認します'),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const StatsScreen()),
               ),
             ),
           ),

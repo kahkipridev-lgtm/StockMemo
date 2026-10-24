@@ -11,6 +11,8 @@ import '../models/stock_level.dart';
 class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
   static const _key = 'inventory_items';
   static const _initializedKey = 'inventory_initialized';
+  // アプリを初めて使い始めた日時（統計ページの「利用開始からの経過日数」に使う）
+  static const _firstLaunchKey = 'app_first_launch_at';
   static const _uuid = Uuid();
   // 分析に使うステータス変更履歴の保持件数上限（古いものから捨てる）
   static const _maxHistoryLength = 30;
@@ -27,9 +29,11 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
     final initialized = prefs.getBool(_initializedKey) ?? false;
 
     if (!initialized) {
-      final defaults = buildDefaultItems(installedAt: DateTime.now());
+      final now = DateTime.now();
+      final defaults = buildDefaultItems(installedAt: now);
       await _save(defaults);
       await prefs.setBool(_initializedKey, true);
+      await prefs.setString(_firstLaunchKey, now.toIso8601String());
       return defaults;
     }
 
@@ -46,10 +50,29 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
       if (raw.contains('"stockLevel":"low"')) {
         await _save(patched);
       }
+      await _seedFirstLaunch(prefs, patched);
       return patched;
     } catch (_) {
       return [];
     }
+  }
+
+  // この更新より前からのユーザーには利用開始日時の記録がないので、
+  // 一番古いアイテムの追加日時を目安として補完する（アプリ更新後の既存データ対応）
+  Future<void> _seedFirstLaunch(
+      SharedPreferences prefs, List<StockItem> items) async {
+    if (prefs.containsKey(_firstLaunchKey)) return;
+    final createdDates = items.map((e) => e.createdAt).whereType<DateTime>();
+    final earliest = createdDates.isEmpty
+        ? DateTime.now()
+        : createdDates.reduce((a, b) => a.isBefore(b) ? a : b);
+    await prefs.setString(_firstLaunchKey, earliest.toIso8601String());
+  }
+
+  Future<DateTime> firstLaunchAt() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_firstLaunchKey);
+    return raw != null ? DateTime.parse(raw) : DateTime.now();
   }
 
   // yomiが未設定のアイテムにデフォルトの読みを付与する（アプリ更新後の既存データ対応）
@@ -223,3 +246,9 @@ class InventoryNotifier extends AsyncNotifier<List<StockItem>> {
 final inventoryProvider =
     AsyncNotifierProvider<InventoryNotifier, List<StockItem>>(
         InventoryNotifier.new);
+
+final firstLaunchAtProvider = FutureProvider<DateTime>((ref) async {
+  // 読み込み処理(とそれに伴う初回起動日時の記録)が終わるのを待ってから取得する
+  await ref.watch(inventoryProvider.future);
+  return ref.watch(inventoryProvider.notifier).firstLaunchAt();
+});
