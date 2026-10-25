@@ -119,6 +119,9 @@ final class RootFlutterViewController: FlutterViewController {
     if items.count > 1 {
       items[1].badgeValue = badgeText(forCount: data["empty"])
     }
+    if items.count > 2 {
+      items[2].badgeValue = badgeText(forCount: data["newAchievements"])
+    }
     if items.count > 3 {
       items[3].badgeValue = (data["hasUnread"] as? Bool == true) ? "!" : nil
     }

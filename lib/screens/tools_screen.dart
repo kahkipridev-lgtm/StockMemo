@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../providers/achievement_seen_provider.dart';
 import 'achievements_screen.dart';
 import 'price_compare_screen.dart';
 import 'price_tag_search_screen.dart';
 import 'stats_screen.dart';
 
-class ToolsScreen extends StatelessWidget {
+class ToolsScreen extends ConsumerWidget {
   const ToolsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
+    final newAchievementCount = ref.watch(unseenAchievementCountProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +67,11 @@ class ToolsScreen extends StatelessWidget {
           Card(
             clipBehavior: Clip.antiAlias,
             child: ListTile(
-              leading: Icon(Icons.emoji_events_rounded, color: colorScheme.primary),
+              leading: Badge(
+                label: Text('$newAchievementCount'),
+                isLabelVisible: newAchievementCount > 0,
+                child: Icon(Icons.emoji_events_rounded, color: colorScheme.primary),
+              ),
               title: const Text('実績'),
               subtitle: const Text('？？？を解除しよう'),
               trailing: const Icon(Icons.chevron_right_rounded),

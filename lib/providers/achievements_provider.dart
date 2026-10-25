@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/achievement.dart';
-import '../models/genre.dart';
 import '../models/stock_level.dart';
+import 'genre_provider.dart';
 import 'inventory_provider.dart';
 import 'purchase_log_provider.dart';
 
@@ -44,14 +44,29 @@ final achievementCategoriesProvider =
     }
   });
 
-  final genreIds = items.map((e) => e.genreId).toSet();
-  final allGenresCovered =
-      Genre.builtIns.every((g) => genreIds.contains(g.id));
+  // 「在庫切れ→在庫あり」に変更した実績があるジャンルを集計する
+  final restockedGenreIds = <String>{};
+  for (final item in items) {
+    final history = item.statusHistory;
+    for (var i = 1; i < history.length; i++) {
+      if (history[i - 1].level == StockLevel.empty &&
+          history[i].level == StockLevel.full) {
+        restockedGenreIds.add(item.genreId);
+        break;
+      }
+    }
+  }
+  final allGenres = ref.watch(allGenresProvider);
+  final allGenresCovered = allGenres.isNotEmpty &&
+      allGenres.every((g) => restockedGenreIds.contains(g.id));
 
   final emptyEventCount = items
       .expand((i) => i.statusHistory)
       .where((h) => h.level == StockLevel.empty)
       .length;
+
+  final maxPurchasedNameLength = purchaseLog.fold<int>(
+      0, (max, e) => e.name.length > max ? e.name.length : max);
 
   return [
     AchievementCategory(
@@ -67,6 +82,8 @@ final achievementCategoriesProvider =
             '累計150個購入した', Icons.workspace_premium_rounded, const Color(0xFF9B7EC8)),
         _tier('total_500', totalPurchases >= 500, '在庫の帝王',
             '累計500個購入した', Icons.emoji_events_rounded, const Color(0xFFC0392B)),
+        _tier('total_1000', totalPurchases >= 1000, '買い物の神',
+            '累計1000個購入した', Icons.auto_awesome_rounded, const Color(0xFF9B7EC8)),
       ],
     ),
     AchievementCategory(
@@ -78,6 +95,8 @@ final achievementCategoriesProvider =
             '1日で5個購入した', Icons.shopping_cart_checkout_rounded, const Color(0xFF1565C0)),
         _tier('daily_10', maxDaily >= 10, '爆買い伝説',
             '1日で10個購入した', Icons.local_fire_department_rounded, const Color(0xFFC0392B)),
+        _tier('daily_20', maxDaily >= 20, '買い物の鬼',
+            '1日で20個購入した', Icons.whatshot_rounded, const Color(0xFF7A5100)),
       ],
     ),
     AchievementCategory(
@@ -104,10 +123,21 @@ final achievementCategoriesProvider =
       ],
     ),
     AchievementCategory(
+      title: '長い名前チャレンジ',
+      achievements: [
+        _tier('name_10', maxPurchasedNameLength >= 10, '長い名前も恐れない',
+            '10文字以上のアイテムを購入した', Icons.text_fields_rounded, const Color(0xFF2E7D32)),
+        _tier('name_15', maxPurchasedNameLength >= 15, '呪文級ネーミング',
+            '15文字以上のアイテムを購入した', Icons.auto_stories_rounded, const Color(0xFF1565C0)),
+        _tier('name_20', maxPurchasedNameLength >= 20, 'もはや呪文',
+            '20文字以上のアイテムを購入した', Icons.menu_book_rounded, const Color(0xFF9B7EC8)),
+      ],
+    ),
+    AchievementCategory(
       title: 'コレクション',
       achievements: [
         _tier('all_genres', allGenresCovered, '全ジャンル制覇',
-            'すべてのジャンルにアイテムを登録した', Icons.diversity_1_rounded, const Color(0xFFB8860B)),
+            'すべてのジャンルで在庫切れから在庫ありに変更した', Icons.diversity_1_rounded, const Color(0xFFB8860B)),
       ],
     ),
     AchievementCategory(
@@ -119,6 +149,10 @@ final achievementCategoriesProvider =
             '在庫切れを20回経験した', Icons.replay_rounded, const Color(0xFFB8860B)),
         _tier('empty_50', emptyEventCount >= 50, '在庫切れマニア',
             '在庫切れを50回経験した', Icons.warning_amber_rounded, const Color(0xFF7A5100)),
+        _tier('empty_100', emptyEventCount >= 100, '在庫切れの主',
+            '在庫切れを100回経験した', Icons.local_fire_department_rounded, const Color(0xFFC0392B)),
+        _tier('empty_500', emptyEventCount >= 500, '在庫切れとは腐れ縁',
+            '在庫切れを500回経験した', Icons.auto_awesome_rounded, const Color(0xFF9B7EC8)),
       ],
     ),
   ];

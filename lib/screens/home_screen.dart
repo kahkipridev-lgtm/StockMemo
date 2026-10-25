@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/achievement.dart';
 import '../models/stock_level.dart';
+import '../providers/achievement_seen_provider.dart';
 import '../providers/achievement_unlock_provider.dart';
 import '../providers/achievements_provider.dart';
 import '../providers/developer_messages_provider.dart';
@@ -91,12 +92,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final emptyCount =
         items.where((item) => item.stockLevel == StockLevel.empty).length;
     final hasUnreadMessage = ref.watch(hasUnreadDeveloperMessageProvider);
+    final newAchievementCount = ref.watch(unseenAchievementCountProvider);
 
     if (_useNativeTabBar) {
       unawaited(
         _nativeTabBarChannel.invokeMethod('updateBadges', {
           'empty': emptyCount,
           'hasUnread': hasUnreadMessage,
+          'newAchievements': newAchievementCount,
         }),
       );
     }
@@ -143,9 +146,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             label: '買い物リスト',
           ),
-          const NavigationDestination(
-            icon: Icon(Icons.handyman_outlined, color: Color(0xFF1565C0)),
-            selectedIcon: Icon(Icons.handyman_rounded, color: Color(0xFF1565C0)),
+          NavigationDestination(
+            icon: Badge(
+              label: Text('$newAchievementCount'),
+              isLabelVisible: newAchievementCount > 0,
+              child: const Icon(Icons.handyman_outlined, color: Color(0xFF1565C0)),
+            ),
+            selectedIcon: Badge(
+              label: Text('$newAchievementCount'),
+              isLabelVisible: newAchievementCount > 0,
+              child: const Icon(Icons.handyman_rounded, color: Color(0xFF1565C0)),
+            ),
             label: 'ツール',
           ),
           NavigationDestination(
