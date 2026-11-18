@@ -5,6 +5,7 @@ import '../models/genre.dart';
 import '../models/stock_level.dart';
 import '../providers/inventory_provider.dart';
 import '../providers/purchase_log_provider.dart';
+import '../providers/settings_provider.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -14,6 +15,7 @@ class StatsScreen extends ConsumerWidget {
     final inventoryAsync = ref.watch(inventoryProvider);
     final purchaseLog = ref.watch(purchaseLogProvider).value ?? [];
     final firstLaunch = ref.watch(firstLaunchAtProvider).value;
+    final useLowLevel = ref.watch(useLowStockLevelProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('統計'), centerTitle: true),
@@ -36,7 +38,9 @@ class StatsScreen extends ConsumerWidget {
 
           final emptyCount =
               items.where((i) => i.stockLevel == StockLevel.empty).length;
-          final fullCount = items.length - emptyCount;
+          final lowCount =
+              items.where((i) => i.stockLevel == StockLevel.low).length;
+          final fullCount = items.length - emptyCount - lowCount;
 
           final emptyDates = items
               .expand((i) => i.statusHistory)
@@ -110,6 +114,17 @@ class StatsScreen extends ConsumerWidget {
                         color: const Color(0xFF357A45),
                       ),
                     ),
+                    if (useLowLevel || lowCount > 0) ...[
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _RatioTile(
+                          label: '残りわずか',
+                          count: lowCount,
+                          total: items.length,
+                          color: const Color(0xFF9B6000),
+                        ),
+                      ),
+                    ],
                     const SizedBox(width: 12),
                     Expanded(
                       child: _RatioTile(

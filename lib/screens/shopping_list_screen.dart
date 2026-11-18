@@ -17,6 +17,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   final _addController = TextEditingController();
   final _addFocusNode = FocusNode();
   final _scrollController = ScrollController();
+  final _addRowKey = GlobalKey();
 
   final _editController = TextEditingController();
   final _editFocusNode = FocusNode();
@@ -49,11 +50,13 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
 
   void _scrollAddRowIntoView() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_scrollController.hasClients) return;
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+      final ctx = _addRowKey.currentContext;
+      if (ctx == null) return;
+      Scrollable.ensureVisible(
+        ctx,
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeOut,
+        alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
       );
     });
   }
@@ -91,7 +94,12 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
   @override
   Widget build(BuildContext context) {
     final asyncItems = ref.watch(shoppingListProvider);
-    final emptyStockItems = (ref.watch(inventoryProvider).value ?? [])
+    final inventoryItems = ref.watch(inventoryProvider).value ?? [];
+    final lowStockItems = inventoryItems
+        .where((item) => item.stockLevel == StockLevel.low)
+        .toList()
+      ..sort((a, b) => a.name.compareTo(b.name));
+    final emptyStockItems = inventoryItems
         .where((item) =>
             item.stockLevel == StockLevel.empty || item.justRestocked)
         .toList()
@@ -138,32 +146,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
           body: CustomScrollView(
             controller: _scrollController,
             slivers: [
-              // 在庫切れアイテム
-              if (emptyStockItems.isNotEmpty) ...[
-                SliverToBoxAdapter(
-                  child: _SectionHeader(
-                    icon: Icons.remove_circle_outline_rounded,
-                    label: '在庫切れ',
-                    color: const Color(0xFFC0392B),
-                  ),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final item = emptyStockItems[index];
-                      return ItemCard(
-                        key: Key(item.id),
-                        item: item,
-                        strikeThrough: item.justRestocked,
-                        onDelete: () => ref
-                            .read(inventoryProvider.notifier)
-                            .deleteItem(item.id),
-                      );
-                    },
-                    childCount: emptyStockItems.length,
-                  ),
-                ),
-                const SliverToBoxAdapter(child: Divider(height: 24)),
+              if (emptyStockItems.isNotEmpty || lowStockItems.isNotEmpty) ...[
                 SliverToBoxAdapter(
                   child: _SectionHeader(
                     icon: Icons.shopping_cart_outlined,
@@ -256,6 +239,7 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
               // 新規入力行
               SliverToBoxAdapter(
                 child: ListTile(
+                  key: _addRowKey,
                   leading: Icon(
                     Icons.radio_button_unchecked_rounded,
                     color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.4),
@@ -275,6 +259,65 @@ class _ShoppingListScreenState extends ConsumerState<ShoppingListScreen> {
                   ),
                 ),
               ),
+
+              // 在庫切れ・残りわずか（買い物メモの下に表示）
+              if (emptyStockItems.isNotEmpty || lowStockItems.isNotEmpty)
+                const SliverToBoxAdapter(child: Divider(height: 24)),
+
+              // 在庫切れアイテム
+              if (emptyStockItems.isNotEmpty) ...[
+                SliverToBoxAdapter(
+                  child: _SectionHeader(
+                    icon: Icons.remove_circle_outline_rounded,
+                    label: '在庫切れ',
+                    color: const Color(0xFFC0392B),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final item = emptyStockItems[index];
+                      return ItemCard(
+                        key: Key(item.id),
+                        item: item,
+                        strikeThrough: item.justRestocked,
+                        onDelete: () => ref
+                            .read(inventoryProvider.notifier)
+                            .deleteItem(item.id),
+                      );
+                    },
+                    childCount: emptyStockItems.length,
+                  ),
+                ),
+              ],
+
+              // 残りわずかアイテム
+              if (lowStockItems.isNotEmpty) ...[
+                if (emptyStockItems.isNotEmpty)
+                  const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                SliverToBoxAdapter(
+                  child: _SectionHeader(
+                    icon: Icons.warning_amber_rounded,
+                    label: '残りわずか',
+                    color: const Color(0xFF9B6000),
+                  ),
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final item = lowStockItems[index];
+                      return ItemCard(
+                        key: Key(item.id),
+                        item: item,
+                        onDelete: () => ref
+                            .read(inventoryProvider.notifier)
+                            .deleteItem(item.id),
+                      );
+                    },
+                    childCount: lowStockItems.length,
+                  ),
+                ),
+              ],
 
               // 画面下の余白エリア：キーボード表示中のみ閉じる
               SliverFillRemaining(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 enum StockLevel {
   full,
+  low,
   empty;
 
   static const _metadata = {
@@ -10,6 +11,14 @@ enum StockLevel {
       color: Color(0xFF357A45),
       backgroundColor: Color(0xFFEDF6E9),
       icon: Icons.check_circle_rounded,
+      sortOrder: 2,
+      next: StockLevel.low,
+    ),
+    StockLevel.low: _Meta(
+      label: '残りわずか',
+      color: Color(0xFF9B6000),
+      backgroundColor: Color(0xFFFFF8ED),
+      icon: Icons.warning_amber_rounded,
       sortOrder: 1,
       next: StockLevel.empty,
     ),
@@ -23,7 +32,14 @@ enum StockLevel {
     ),
   };
 
-  StockLevel get next => _metadata[this]!.next;
+  /// タップ時の次のステータス。
+  /// [useLowLevel] が false（在庫あり／在庫切れの2段階設定）のときは「残りわずか」を飛ばす。
+  StockLevel nextLevel({required bool useLowLevel}) {
+    final n = _metadata[this]!.next;
+    if (!useLowLevel && n == StockLevel.low) return StockLevel.empty;
+    return n;
+  }
+
   String get label => _metadata[this]!.label;
   Color get color => _metadata[this]!.color;
   Color get backgroundColor => _metadata[this]!.backgroundColor;
@@ -33,7 +49,6 @@ enum StockLevel {
   String toJson() => name;
 
   static StockLevel fromJson(String value) {
-    if (value == 'low') return StockLevel.empty; // 旧「残りわずか」データを在庫切れとして扱う
     return StockLevel.values.firstWhere(
       (e) => e.name == value,
       orElse: () => StockLevel.full,

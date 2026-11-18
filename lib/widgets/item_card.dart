@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/stock_item.dart';
 import '../providers/inventory_provider.dart';
+import '../providers/settings_provider.dart';
 
 class ItemCard extends ConsumerWidget {
   final StockItem item;
@@ -196,7 +197,10 @@ class _StockLevelChip extends ConsumerWidget {
       onTap: () {
         ref
             .read(inventoryProvider.notifier)
-            .updateStockLevel(item.id, level.next);
+            .updateStockLevel(
+              item.id,
+              level.nextLevel(useLowLevel: ref.read(useLowStockLevelProvider)),
+            );
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),

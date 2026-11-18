@@ -29,6 +29,7 @@ class SettingsScreen extends ConsumerWidget {
             _SectionHeader(title: '表示'),
             _ThemeSetting(settings: settings),
             _SortSetting(settings: settings),
+            _StockLevelModeSetting(settings: settings),
             const Divider(),
             _SectionHeader(title: 'データ管理'),
             _ResetStockTile(),
@@ -145,6 +146,41 @@ class _SortSetting extends ConsumerWidget {
                 .updateDefaultSortOrder(value);
           }
         },
+      ),
+    );
+  }
+}
+
+class _StockLevelModeSetting extends ConsumerWidget {
+  final AppSettings settings;
+  const _StockLevelModeSetting({required this.settings});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ListTile(
+      leading: const Icon(Icons.stacked_bar_chart_rounded),
+      title: const Text('在庫ステータス'),
+      subtitle: Text(
+        settings.useLowStockLevel
+            ? '在庫あり／残りわずか／在庫切れ'
+            : '在庫あり／在庫切れ',
+      ),
+      trailing: SegmentedButton<bool>(
+        segments: const [
+          ButtonSegment(value: true, label: Text('3段階')),
+          ButtonSegment(value: false, label: Text('2段階')),
+        ],
+        selected: {settings.useLowStockLevel},
+        showSelectedIcon: false,
+        onSelectionChanged: (value) {
+          ref
+              .read(settingsProvider.notifier)
+              .updateUseLowStockLevel(value.first);
+        },
+        style: const ButtonStyle(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
       ),
     );
   }
