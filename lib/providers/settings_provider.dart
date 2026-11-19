@@ -10,22 +10,28 @@ class AppSettings {
   final SortOrder defaultSortOrder;
   // true: 在庫あり／残りわずか／在庫切れの3段階、false: 在庫あり／在庫切れの2段階
   final bool useLowStockLevel;
+  // true: 買い物リストのタブを離れたとき（アプリを閉じたときも）に、完了した項目を自動で削除する
+  final bool autoClearShoppingList;
 
   const AppSettings({
     this.themeMode = ThemeMode.system,
     this.defaultSortOrder = SortOrder.alphabetical,
     this.useLowStockLevel = true,
+    this.autoClearShoppingList = false,
   });
 
   AppSettings copyWith({
     ThemeMode? themeMode,
     SortOrder? defaultSortOrder,
     bool? useLowStockLevel,
+    bool? autoClearShoppingList,
   }) {
     return AppSettings(
       themeMode: themeMode ?? this.themeMode,
       defaultSortOrder: defaultSortOrder ?? this.defaultSortOrder,
       useLowStockLevel: useLowStockLevel ?? this.useLowStockLevel,
+      autoClearShoppingList:
+          autoClearShoppingList ?? this.autoClearShoppingList,
     );
   }
 
@@ -33,6 +39,7 @@ class AppSettings {
         'themeMode': themeMode.index,
         'defaultSortOrder': defaultSortOrder.index,
         'useLowStockLevel': useLowStockLevel,
+        'autoClearShoppingList': autoClearShoppingList,
       };
 
   factory AppSettings.fromJson(Map<String, dynamic> json) => AppSettings(
@@ -40,6 +47,8 @@ class AppSettings {
         defaultSortOrder:
             SortOrder.values[json['defaultSortOrder'] as int? ?? 0],
         useLowStockLevel: json['useLowStockLevel'] as bool? ?? true,
+        autoClearShoppingList:
+            json['autoClearShoppingList'] as bool? ?? false,
       );
 }
 
@@ -71,6 +80,13 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
   Future<void> updateUseLowStockLevel(bool value) async {
     final current = state.value ?? const AppSettings();
     final updated = current.copyWith(useLowStockLevel: value);
+    await _save(updated);
+    state = AsyncData(updated);
+  }
+
+  Future<void> updateAutoClearShoppingList(bool value) async {
+    final current = state.value ?? const AppSettings();
+    final updated = current.copyWith(autoClearShoppingList: value);
     await _save(updated);
     state = AsyncData(updated);
   }

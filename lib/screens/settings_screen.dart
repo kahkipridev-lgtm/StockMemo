@@ -30,6 +30,7 @@ class SettingsScreen extends ConsumerWidget {
             _ThemeSetting(settings: settings),
             _SortSetting(settings: settings),
             _StockLevelModeSetting(settings: settings),
+            _AutoClearShoppingListSetting(settings: settings),
             const Divider(),
             _SectionHeader(title: 'データ管理'),
             _ResetStockTile(),
@@ -147,6 +148,26 @@ class _SortSetting extends ConsumerWidget {
           }
         },
       ),
+    );
+  }
+}
+
+class _AutoClearShoppingListSetting extends ConsumerWidget {
+  final AppSettings settings;
+  const _AutoClearShoppingListSetting({required this.settings});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SwitchListTile(
+      secondary: const Icon(Icons.auto_delete_rounded),
+      title: const Text('買い物リストの自動削除'),
+      subtitle: const Text('タブを離れたときに、完了した項目を自動で削除します'),
+      value: settings.autoClearShoppingList,
+      onChanged: (value) {
+        ref
+            .read(settingsProvider.notifier)
+            .updateAutoClearShoppingList(value);
+      },
     );
   }
 }

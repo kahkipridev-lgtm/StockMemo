@@ -5,16 +5,21 @@ class PurchaseLogEntry {
   final String name;
   final DateTime purchasedAt;
 
+  /// 予測画面の「買ってきた」で記録したときの在庫アイテムID（名前が同じ別アイテムに付けないため）
+  final String? itemId;
+
   const PurchaseLogEntry({
     required this.id,
     required this.name,
     required this.purchasedAt,
+    this.itemId,
   });
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
         'purchasedAt': purchasedAt.toIso8601String(),
+        if (itemId != null) 'itemId': itemId,
       };
 
   static PurchaseLogEntry? fromJson(Map<String, dynamic> json) {
@@ -23,6 +28,11 @@ class PurchaseLogEntry {
     final id = json['id'] as String?;
     final name = json['name'] as String?;
     if (purchasedAt == null || id == null || name == null) return null;
-    return PurchaseLogEntry(id: id, name: name, purchasedAt: purchasedAt);
+    return PurchaseLogEntry(
+      id: id,
+      name: name,
+      purchasedAt: purchasedAt,
+      itemId: json['itemId'] as String?,
+    );
   }
 }

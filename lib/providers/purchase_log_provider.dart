@@ -37,11 +37,16 @@ class PurchaseLogNotifier extends AsyncNotifier<List<PurchaseLogEntry>> {
     );
   }
 
-  Future<void> logPurchase(String name) async {
+  Future<void> logPurchase(String name, {String? itemId}) async {
     final current = state.value ?? [];
     var updated = [
       ...current,
-      PurchaseLogEntry(id: _uuid.v4(), name: name, purchasedAt: DateTime.now()),
+      PurchaseLogEntry(
+        id: _uuid.v4(),
+        name: name,
+        purchasedAt: DateTime.now(),
+        itemId: itemId,
+      ),
     ];
     if (updated.length > _maxEntries) {
       updated = updated.sublist(updated.length - _maxEntries);

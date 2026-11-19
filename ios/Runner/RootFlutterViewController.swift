@@ -12,11 +12,24 @@ final class RootFlutterViewController: FlutterViewController {
     let title: String
     let icon: String
     let selectedIcon: String
+    /// true のときは SF Symbols ではなく Assets.xcassets の自作アイコンを使う
+    var isAsset = false
+
+    var image: UIImage? {
+      isAsset ? UIImage(named: icon) : UIImage(systemName: icon)
+    }
+
+    var selectedImage: UIImage? {
+      isAsset ? UIImage(named: selectedIcon) : UIImage(systemName: selectedIcon)
+    }
   }
 
+  // Dart側(home_screen.dart)のタブ順・NavigationDestinationと同期させること
   private let tabs: [TabSpec] = [
     TabSpec(title: "在庫を確認", icon: "shippingbox", selectedIcon: "shippingbox.fill"),
     TabSpec(title: "買い物リスト", icon: "cart", selectedIcon: "cart.fill"),
+    // SF Symbolsにカンガルーが無いため自作アイコン
+    TabSpec(title: "在庫予測", icon: "Kangaroo", selectedIcon: "KangarooFill", isAsset: true),
     TabSpec(title: "ツール", icon: "wrench.and.screwdriver", selectedIcon: "wrench.and.screwdriver.fill"),
     TabSpec(title: "設定", icon: "gearshape", selectedIcon: "gearshape.fill"),
   ]
@@ -39,8 +52,8 @@ final class RootFlutterViewController: FlutterViewController {
     tabBar.items = tabs.map { spec in
       let item = UITabBarItem(
         title: spec.title,
-        image: UIImage(systemName: spec.icon),
-        selectedImage: UIImage(systemName: spec.selectedIcon)
+        image: spec.image,
+        selectedImage: spec.selectedImage
       )
       item.setTitleTextAttributes([.font: labelFont], for: .normal)
       item.setTitleTextAttributes([.font: labelFont], for: .selected)
@@ -116,14 +129,18 @@ final class RootFlutterViewController: FlutterViewController {
       return "\(count)"
     }
 
+    // 0:在庫を確認 1:買い物リスト 2:在庫予測 3:ツール 4:設定
     if items.count > 1 {
       items[1].badgeValue = badgeText(forCount: data["empty"])
     }
     if items.count > 2 {
-      items[2].badgeValue = badgeText(forCount: data["newAchievements"])
+      items[2].badgeValue = badgeText(forCount: data["forecastSoon"])
     }
     if items.count > 3 {
-      items[3].badgeValue = (data["hasUnread"] as? Bool == true) ? "!" : nil
+      items[3].badgeValue = badgeText(forCount: data["newAchievements"])
+    }
+    if items.count > 4 {
+      items[4].badgeValue = (data["hasUnread"] as? Bool == true) ? "!" : nil
     }
   }
 }
